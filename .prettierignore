@@ -1,0 +1,17 @@
+node_modules
+.next
+dist
+build
+coverage
+out
+*.min.js
+*.min.css
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+.agents/skills/architecture-decision-records
+.agents/skills/playwright-best-practices
+.agents/skills/playwright-cli
+.agents/skills/systematic-debugging
+.agents/skills/vitest
+.agents/skills/verification-before-completion
