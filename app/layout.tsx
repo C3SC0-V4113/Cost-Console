@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono, Inter, Roboto_Slab } from 'next/font/google';
 
 import './globals.css';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 import type { Metadata } from 'next';
 

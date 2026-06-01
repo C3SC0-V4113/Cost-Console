@@ -1,5 +1,8 @@
+import { ArrowRight } from 'lucide-react';
 import { type Metadata } from 'next';
 import Image from 'next/image';
+
+import { cn } from '../lib/utils';
 
 export const metadata: Metadata = {
   title: 'Cost Console',
@@ -8,8 +11,16 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-gray-950">
-      <main className="flex w-full max-w-3xl flex-1 flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-gray-950">
+    <div
+      className={cn(
+        'flex flex-1 flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-gray-950'
+      )}
+    >
+      <main
+        className={cn(
+          'flex w-full max-w-3xl flex-1 flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-gray-950'
+        )}
+      >
         <Image
           className="dark:invert"
           src="/next.svg"
@@ -57,11 +68,12 @@ export default function Home() {
             Deploy Now
           </a>
           <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
             target="_blank"
             rel="noopener noreferrer"
           >
+            <ArrowRight aria-hidden="true" className="size-4" />
             Documentation
           </a>
         </div>

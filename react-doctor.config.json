@@ -1,5 +1,11 @@
 {
   "ignore": {
-    "files": [".agents/**", ".claude/**", "components/ui/**"]
+    "files": [".agents/**", ".claude/**", "components/ui/**"],
+    "overrides": [
+      {
+        "files": ["lib/utils.ts"],
+        "rules": ["deslop/unused-file"]
+      }
+    ]
   }
 }

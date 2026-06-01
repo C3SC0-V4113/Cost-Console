@@ -9,7 +9,6 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: [{ find: '@', replacement: rootDirectory }],
-    tsconfigPaths: true,
   },
   test: {
     environment: 'jsdom',
