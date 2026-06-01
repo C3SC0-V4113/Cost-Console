@@ -17,6 +17,8 @@
     "doctor:staged": "react-doctor . --staged --fail-on warning",
     "doctor:ci": "react-doctor . --fail-on warning",
     "doctor:upgrade": "npx react-doctor@latest",
+    "scan:init": "react-scan init -y --skip-install",
+    "scan": "next dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",

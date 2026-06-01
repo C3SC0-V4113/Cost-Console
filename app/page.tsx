@@ -2,7 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import { type Metadata } from 'next';
 import Image from 'next/image';
 
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Cost Console',
