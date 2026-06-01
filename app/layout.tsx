@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono, Inter, Roboto_Slab } from 'next/font/google';
-
 import './globals.css';
+import Script from 'next/script';
+
 import { cn } from '../lib/utils';
 
 import type { Metadata } from 'next';
@@ -42,7 +43,16 @@ export default function RootLayout({
         robotoSlabHeading.variable
       )}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {process.env.NODE_ENV === 'development' && (
+          <Script
+            src="https://unpkg.com/react-scan/dist/auto.global.js"
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        )}
+        {children}
+      </body>
     </html>
   );
 }
