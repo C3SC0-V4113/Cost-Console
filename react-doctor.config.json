@@ -1,0 +1,11 @@
+{
+  "ignore": {
+    "files": [".agents/**", ".claude/**"],
+    "overrides": [
+      {
+        "files": ["components/ui/**"],
+        "rules": ["knip/exports", "exports"]
+      }
+    ]
+  }
+}

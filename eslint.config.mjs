@@ -5,11 +5,16 @@ import nextTs from 'eslint-config-next/typescript';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
 import playwrightPlugin from 'eslint-plugin-playwright';
+import reactDoctor from 'eslint-plugin-react-doctor';
+import reactYouMightNotNeedAnEffect from 'eslint-plugin-react-you-might-not-need-an-effect';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  reactDoctor.configs.recommended,
+  reactDoctor.configs.next,
+  reactYouMightNotNeedAnEffect.configs.recommended,
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     plugins: {
