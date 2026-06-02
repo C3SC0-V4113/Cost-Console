@@ -59,6 +59,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-playwright": "^2.10.4",
     "eslint-plugin-react-doctor": "^0.2.14",
     "eslint-plugin-react-you-might-not-need-an-effect": "^1.0.0",
