@@ -151,6 +151,37 @@ implementation or document the decision in a local ADR.
   the selected input/cache pricing; it should not be treated as a standalone
   catalog price by default.
 
+## RAG And Vector Search Diagrams
+
+- RAG diagrams should explain the pipeline as documents, chunking, embedding
+  ingestion, vector index/storage, query embedding, retrieval/ranking, retrieved
+  context, LLM generation, and response.
+- Diagram labels must show what travels between nodes: tokens, chunks, vectors,
+  retrieved context, and generated output.
+- Editable diagram parameters should map to real retrieval assumptions such as
+  chunk size, overlap, cleanup ratio, embedding model, query volume, `top-k`,
+  score threshold, hybrid semantic/text weights, retrieved chunk size, and final
+  model.
+- Do not describe arbitrary "DB weights" unless they map to a documented
+  retrieval or ranking parameter.
+- If a future React Flow-style diagram is used, it should mirror form inputs and
+  explain the process; backend calculation logic remains the source of math.
+
+## RAG Benchmark And Source Labels
+
+- Benchmark and pricing source labels should distinguish official pricing,
+  official docs, third-party benchmarks, and internal/manual assumptions.
+- Each benchmark/source entry should show source URL, source date,
+  provider/tool, dataset or scenario context, measured metric, assumptions, and
+  source type.
+- Real-life benchmark values must not be mixed silently with official pricing.
+- RAG infrastructure or vector-store storage cost should be optional and
+  source-backed; unknown storage pricing should not block token and embedding
+  cost estimates.
+- Cost labels must keep embedding ingestion cost, query embedding cost,
+  retrieved-context LLM input cost, final LLM output cost, and vector storage
+  cost visibly separate.
+
 ## Data Display
 
 - Tables are the default for pricing catalogs, saved scenarios, provider/model

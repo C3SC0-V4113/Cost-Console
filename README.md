@@ -95,7 +95,8 @@ The planned first surfaces are:
   traceability;
 - one unified Chat Cost Playground for interaction volume, token buckets, prompt
   caching, educational helpers, saved scenarios, and day/month/year summaries;
-- future placeholder surfaces for Embeddings, Vector Query, and RAG Scenarios.
+- a planned RAG Cost Lab for embedding ingestion, vector query cost, retrieval
+  configuration, benchmark/source notes, and end-to-end RAG summaries.
 
 ## Persistence Contract
 

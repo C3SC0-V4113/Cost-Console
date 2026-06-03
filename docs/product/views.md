@@ -25,6 +25,7 @@ Planned navigation:
 
 - `Chat Cost`;
 - `Pricing Catalog`;
+- `RAG Cost Lab`;
 - future `Embeddings`;
 - future `Vector Query`;
 - future `RAG Scenarios`.
@@ -185,7 +186,189 @@ Expected actions:
 - compare scenario against current inputs;
 - identify stale or missing pricing.
 
-## Future Placeholder Views
+## RAG Cost Lab
+
+The RAG Cost Lab is the planned unified surface for embedding ingestion, vector
+query cost, retrieval configuration, and end-to-end RAG scenario summaries. It is
+still documentation-only and does not imply implemented routes, React Flow,
+runtime dependencies, schemas, APIs, or calculation helpers.
+
+This view should cover the required product points that go beyond chat:
+
+- tokens consumed when embedding an initial document load into a vector store;
+- tokens consumed when embedding each query used for vector DB lookup;
+- retrieved context tokens sent back into the final LLM request;
+- final LLM output tokens and end-to-end daily/monthly/yearly cost.
+
+The documented RAG flow is:
+
+1. source documents;
+2. chunking;
+3. embedding ingestion;
+4. vector index or storage;
+5. query embedding;
+6. vector or hybrid search;
+7. retrieved chunks;
+8. LLM context;
+9. generated output.
+
+Planned sections:
+
+- ingestion setup;
+- vector index assumptions;
+- query workload;
+- retrieval configuration;
+- interactive pipeline diagram;
+- benchmark and source notes;
+- cost summary.
+
+### Ingestion Setup
+
+Planned ingestion inputs:
+
+- document count;
+- average document tokens;
+- cleanup ratio;
+- chunk size;
+- chunk overlap;
+- embedding model;
+- embedding price;
+- expected chunks;
+- total embedding tokens;
+- ingestion batch assumptions.
+
+The summary should separate one-time embedding ingestion cost from recurring
+query cost. Ingestion should not be mixed with vector storage or retrieval cost
+without a clear label.
+
+### Vector Index Assumptions
+
+Planned vector DB assumptions:
+
+- vector store or provider;
+- storage unit;
+- storage cost if known;
+- embedding dimensions if relevant;
+- metadata/filtering note;
+- source URL and source date for benchmark or pricing values.
+
+RAG storage/retrieval infrastructure cost is optional and must be source-backed.
+If storage pricing is unknown, the view should still calculate embedding and LLM
+token costs without inventing storage prices.
+
+### Query Workload And Retrieval Configuration
+
+Planned query inputs:
+
+- queries per day;
+- days per month;
+- average query tokens;
+- query embedding model;
+- `top-k`;
+- average retrieved chunk tokens;
+- score threshold;
+- optional filters;
+- hybrid-search semantic/text weights where applicable.
+
+"Weights" in this view means real pipeline parameters such as `top-k`, score
+threshold, chunk size, overlap, cleanup ratio, or hybrid semantic/text weighting.
+It does not mean arbitrary weights assigned to a RAG database.
+
+### Generation Inputs
+
+Planned generation inputs:
+
+- final LLM model;
+- system prompt tokens;
+- retrieved context tokens;
+- expected output tokens;
+- prompt caching assumptions if retrieved or static context can be reused.
+
+The view should distinguish query embedding tokens from final LLM input tokens.
+The query is embedded for retrieval; retrieved chunks then become part of the LLM
+context when generating the answer.
+
+### Cost Summary
+
+Required RAG Cost Lab summary outputs:
+
+- one-time ingestion cost;
+- per-query embedding cost;
+- per-query retrieved-context LLM input cost;
+- per-query output cost;
+- daily query cost;
+- monthly query cost;
+- yearly query cost;
+- storage or vector-store cost if available;
+- total monthly and yearly scenario estimate.
+
+## Interactive Pipeline Diagram Concept
+
+The pipeline diagram is documented as a future React Flow-style concept, not as
+an installed dependency or implementation commitment.
+
+Planned nodes:
+
+- Source Documents;
+- Chunking;
+- Embedding Ingestion;
+- Vector Index;
+- Query Embedding;
+- Retrieval/Ranking;
+- Retrieved Context;
+- LLM Generation;
+- Response.
+
+Editable node parameters should mirror the form inputs:
+
+- chunk size;
+- overlap;
+- cleanup ratio;
+- embedding model;
+- query volume;
+- `top-k`;
+- score threshold;
+- hybrid semantic/text weights;
+- retrieved chunk size;
+- final model.
+
+Edge labels should show what travels between nodes:
+
+- tokens;
+- chunks;
+- vectors;
+- retrieved context;
+- generated output.
+
+The diagram should explain the process and make assumptions easier to inspect.
+The future backend calculation engine remains the source of math.
+
+## Benchmark And Source Policy
+
+Pricing and benchmarks may use primary sources plus curated notes. The product
+spec is grounded by these reference categories:
+
+- official retrieval/vector-store documentation, such as
+  [OpenAI Retrieval docs](https://developers.openai.com/api/docs/guides/retrieval);
+- official prompt-caching documentation, such as
+  [OpenAI Prompt Caching docs](https://developers.openai.com/api/docs/guides/prompt-caching);
+- official pricing pages, such as
+  [OpenAI API Pricing](https://openai.com/api/pricing/).
+
+Every benchmark or source entry should document:
+
+- source URL;
+- source date;
+- provider or tool;
+- dataset or scenario context;
+- measured metric;
+- assumptions;
+- whether it is official, third-party, or internal/manual.
+
+Real-life benchmark values must not be mixed silently with official pricing. The
+UI and docs should distinguish pricing facts from benchmark assumptions.
+
+## Future Follow-Up Views
 
 These surfaces remain planned follow-ups and should not be treated as implemented
 until separate runtime work starts:
@@ -194,5 +377,6 @@ until separate runtime work starts:
 - Vector Query Cost Playground;
 - End-to-End RAG Scenario Builder.
 
-Their future implementations should follow the product boundary in `README.md`,
-the UX rules in `DESIGN.md`, and the local ADRs in `docs/adr/`.
+They may later split out of RAG Cost Lab if the unified surface becomes too dense
+for real users. Their future implementations should follow the product boundary
+in `README.md`, the UX rules in `DESIGN.md`, and the local ADRs in `docs/adr/`.
