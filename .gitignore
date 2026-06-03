@@ -50,3 +50,6 @@ node_modules/
 
 # Claude Code skill bridge
 /.claude/skills/
+
+# Local scaffold CLI build output
+/tools/scaffold-next-quality/dist/

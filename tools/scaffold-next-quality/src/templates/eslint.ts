@@ -1,14 +1,14 @@
-import vitest from '@vitest/eslint-plugin';
-import { defineConfig, globalIgnores } from 'eslint/config';
+import type { CreateOptions } from '../types.js';
+
+export function renderEslintConfig(options: Pick<CreateOptions, 'unit' | 'e2e'>) {
+  return `import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
-import playwrightPlugin from 'eslint-plugin-playwright';
-import reactDoctor from 'eslint-plugin-react-doctor';
+${options.e2e ? "import playwrightPlugin from 'eslint-plugin-playwright';\n" : ''}import reactDoctor from 'eslint-plugin-react-doctor';
 import reactYouMightNotNeedAnEffect from 'eslint-plugin-react-you-might-not-need-an-effect';
-import testingLibraryPlugin from 'eslint-plugin-testing-library';
-
+${options.unit ? "import testingLibraryPlugin from 'eslint-plugin-testing-library';\nimport vitest from '@vitest/eslint-plugin';\n" : ''}
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -74,57 +74,9 @@ const eslintConfig = defineConfig([
       ],
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
-      '@typescript-eslint/naming-convention': [
-        'error',
-        {
-          selector: 'objectLiteralProperty',
-          modifiers: ['requiresQuotes'],
-          filter: {
-            regex: '^[a-z]+(?:-[a-z0-9]+)+$',
-            match: true,
-          },
-          format: null,
-        },
-        {
-          selector: 'default',
-          format: ['camelCase'],
-        },
-        {
-          selector: 'variable',
-          format: ['PascalCase', 'UPPER_CASE'],
-          types: ['boolean'],
-          prefix: ['is', 'should', 'has', 'can', 'did', 'will', 'as'],
-        },
-        {
-          selector: 'variableLike',
-          format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
-        },
-        {
-          selector: 'parameter',
-          format: ['camelCase', 'PascalCase'],
-        },
-        {
-          selector: 'memberLike',
-          modifiers: ['private'],
-          format: ['camelCase'],
-          leadingUnderscore: 'forbid',
-        },
-        {
-          selector: 'typeLike',
-          format: ['PascalCase'],
-        },
-        {
-          selector: 'enumMember',
-          format: ['UPPER_CASE'],
-        },
-        {
-          selector: 'import',
-          format: ['camelCase', 'PascalCase'],
-        },
-      ],
     },
   },
-  {
+${options.unit ? `  {
     files: [
       '**/*.{test,spec}.{js,jsx,ts,tsx,mjs,mts,cjs,cts}',
       'tests/unit/**/*.{js,jsx,ts,tsx,mjs,mts,cjs,cts}',
@@ -148,7 +100,7 @@ const eslintConfig = defineConfig([
     ignores: ['tests/e2e/**', 'e2e/**', 'playwright/**'],
     ...testingLibraryPlugin.configs['flat/react'],
   },
-  {
+` : ''}${options.e2e ? `  {
     files: [
       'tests/e2e/**/*.{js,jsx,ts,tsx,mjs,mts,cjs,cts}',
       'e2e/**/*.{js,jsx,ts,tsx,mjs,mts,cjs,cts}',
@@ -156,20 +108,20 @@ const eslintConfig = defineConfig([
     ],
     ...playwrightPlugin.configs['flat/recommended'],
   },
-  eslintConfigPrettier,
-  // Override default ignores of eslint-config-next.
+` : ''}  eslintConfigPrettier,
   globalIgnores([
-    // Default ignores of eslint-config-next:
     '.next/**',
     'out/**',
     'build/**',
     'next-env.d.ts',
     '.agents/**',
     '.claude/**',
-    'tools/scaffold-next-quality/**',
+    'coverage/**',
     'playwright-report/**',
     'test-results/**',
   ]),
 ]);
 
 export default eslintConfig;
+`;
+}

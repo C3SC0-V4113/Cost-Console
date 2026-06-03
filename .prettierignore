@@ -9,6 +9,7 @@ out
 pnpm-lock.yaml
 yarn.lock
 package-lock.json
+tools/scaffold-next-quality
 .agents/skills/architecture-decision-records
 .agents/skills/playwright-best-practices
 .agents/skills/playwright-cli
