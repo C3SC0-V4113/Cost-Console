@@ -182,6 +182,28 @@ implementation or document the decision in a local ADR.
   retrieved-context LLM input cost, final LLM output cost, and vector storage
   cost visibly separate.
 
+## Text-to-SQL Accuracy And Semantic Layer Rules
+
+- Text-to-SQL views should compare raw Text-to-SQL, Text-to-SQL with a semantic
+  layer, and Text-to-SQL with a semantic layer plus validation or retry loops.
+- Accuracy must be labeled as benchmark- and scenario-dependent, never as a
+  universal model property.
+- Accuracy labels should show metric type, benchmark preset, source date,
+  provider/model, dataset or scenario context, and whether values are official,
+  third-party, or manual.
+- Semantic-layer helper text should explain whether the layer constrains SQL
+  generation, provides business metadata, or generates governed metric queries
+  itself.
+- Text-to-SQL cost summaries should separate question/input tokens,
+  schema/context tokens, semantic-layer context tokens, SQL output tokens,
+  validation/retry tokens, cached input when applicable, and optional warehouse
+  execution cost.
+- Warehouse or database execution cost is optional and must be source-backed. If
+  unknown, label it as unavailable instead of inventing a value.
+- The UI should make the tradeoff visible: semantic layers may add context/token
+  cost while improving accuracy, reducing silent wrong answers, or failing
+  loudly when a question is not answerable.
+
 ## Data Display
 
 - Tables are the default for pricing catalogs, saved scenarios, provider/model

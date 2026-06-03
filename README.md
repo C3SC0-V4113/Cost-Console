@@ -97,6 +97,9 @@ The planned first surfaces are:
   caching, educational helpers, saved scenarios, and day/month/year summaries;
 - a planned RAG Cost Lab for embedding ingestion, vector query cost, retrieval
   configuration, benchmark/source notes, and end-to-end RAG summaries.
+- a planned Text-to-SQL Cost Lab for raw SQL generation, semantic-layer-assisted
+  generation, validation/retry cost, optional warehouse execution cost, and
+  source-backed accuracy comparison.
 
 ## Persistence Contract
 

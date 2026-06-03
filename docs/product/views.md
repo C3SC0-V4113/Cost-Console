@@ -8,8 +8,8 @@ APIs, schemas, TypeScript types, calculation helpers, tests, or database tables.
 
 - The app should open into a usable cost playground, not a marketing landing
   page.
-- The first implementation target is one unified Chat Cost Playground supported
-  by a Pricing Catalog.
+- The first documented surfaces are a Chat Cost Playground, Pricing Catalog, RAG
+  Cost Lab, and Text-to-SQL Cost Lab.
 - Pricing and calculations must remain traceable through provider, model,
   source, snapshot, assumptions, and token buckets.
 - Educational copy should be compact and local to labels, section titles, or
@@ -26,6 +26,7 @@ Planned navigation:
 - `Chat Cost`;
 - `Pricing Catalog`;
 - `RAG Cost Lab`;
+- `Text-to-SQL Cost Lab`;
 - future `Embeddings`;
 - future `Vector Query`;
 - future `RAG Scenarios`.
@@ -302,6 +303,126 @@ Required RAG Cost Lab summary outputs:
 - storage or vector-store cost if available;
 - total monthly and yearly scenario estimate.
 
+## Text-to-SQL Cost Lab
+
+The Text-to-SQL Cost Lab is the planned surface for comparing raw Text-to-SQL
+against Text-to-SQL with a semantic layer. It is documentation-only and does not
+imply implemented routes, runtime dependencies, schemas, APIs, calculation
+helpers, benchmark presets, or tests.
+
+This view should model:
+
+- LLM token cost for natural-language questions, schema context, semantic
+  metadata, generated SQL, validation prompts, and repair attempts;
+- semantic-layer overhead and expected accuracy impact;
+- optional warehouse or database execution cost when source-backed;
+- accuracy as a benchmark- or scenario-specific metric, not a universal model
+  property.
+
+Planned sections:
+
+- model and pricing selection;
+- schema and context setup;
+- semantic-layer mode;
+- workload volume;
+- SQL generation and validation loop;
+- benchmark and accuracy source;
+- optional warehouse execution cost;
+- cost and accuracy summary.
+
+### Text-to-SQL Core Inputs
+
+Planned core inputs:
+
+- provider/model;
+- pricing snapshot;
+- questions per day;
+- days per month;
+- average natural-language question tokens;
+- schema/context tokens;
+- semantic metadata tokens;
+- expected SQL output tokens;
+- validation prompt tokens;
+- average retries or repair attempts;
+- prompt caching assumptions where applicable.
+
+### Semantic-Layer Inputs
+
+Planned semantic-layer inputs:
+
+- semantic layer mode: none, headless semantic layer, or native/platform
+  semantic layer;
+- semantic definitions included: metrics, dimensions, joins/entities,
+  descriptions, synonyms, and certified queries;
+- semantic context token size;
+- semantic-layer source URL and source date;
+- whether the semantic layer constrains SQL generation or generates SQL/metrics
+  queries itself.
+
+The view should explain that a semantic layer may add context tokens while
+improving correctness, reducing ambiguity, or making unanswerable questions fail
+more explicitly.
+
+### Accuracy Inputs
+
+Planned accuracy inputs:
+
+- benchmark preset: dbt semantic-layer benchmark, BIRD, Denodo-style
+  semantic-layer benchmark, or custom/manual;
+- metric type: execution accuracy, answer accuracy, exact match, or
+  benchmark-defined score;
+- baseline accuracy without semantic layer;
+- expected accuracy with semantic layer;
+- confidence/source notes;
+- user override value with notes when the benchmark does not match the user's
+  domain.
+
+Accuracy can come from benchmark presets plus a documented user override.
+Overrides must show notes and should be visually distinct from source-backed
+benchmark values.
+
+### Optional Warehouse Execution Cost
+
+Planned warehouse cost inputs:
+
+- warehouse/database provider;
+- execution pricing unit if known;
+- average query execution cost or benchmarked runtime cost;
+- source URL and source date;
+- unavailable state when no source-backed value exists.
+
+Warehouse/database execution cost is optional. If unknown, the view should still
+calculate LLM token cost and label execution cost as unavailable instead of
+inventing a value.
+
+### Text-to-SQL Outputs
+
+The Text-to-SQL summary should show LLM cost per question, day, month, and year.
+
+Required cost line items:
+
+- question/input tokens;
+- schema/context tokens;
+- semantic-layer context tokens;
+- SQL output tokens;
+- validation/retry tokens;
+- cached input if applicable;
+- optional warehouse execution cost.
+
+Required accuracy summary:
+
+- baseline accuracy without semantic layer;
+- semantic-layer accuracy;
+- accuracy delta;
+- benchmark/source used;
+- warning when values are user-entered or domain-mismatched.
+
+Required scenario comparison:
+
+- raw Text-to-SQL;
+- Text-to-SQL with semantic layer;
+- Text-to-SQL with semantic layer plus validation/retry loop.
+
 ## Interactive Pipeline Diagram Concept
 
 The pipeline diagram is documented as a future React Flow-style concept, not as
@@ -354,6 +475,14 @@ spec is grounded by these reference categories:
   [OpenAI Prompt Caching docs](https://developers.openai.com/api/docs/guides/prompt-caching);
 - official pricing pages, such as
   [OpenAI API Pricing](https://openai.com/api/pricing/).
+- Text-to-SQL semantic-layer benchmark sources, such as
+  [dbt LLM Semantic Layer Benchmark](https://dbt-labs.github.io/dbt-llm-sl-bench/),
+  [dbt benchmark compare](https://dbt-labs.github.io/dbt-llm-sl-bench/compare/),
+  [dbt repeated runs](https://dbt-labs.github.io/dbt-llm-sl-bench/repeated-runs/),
+  [dbt historical results](https://dbt-labs.github.io/dbt-llm-sl-bench/historical/),
+  [BIRD benchmark](https://bird-bench.github.io/),
+  [BIRD paper](https://arxiv.org/abs/2305.03111), and
+  [Denodo semantic-layer Text-to-SQL article](https://www.datamanagementblog.com/improving-the-accuracy-of-llm-based-text-to-sql-generation-with-a-semantic-layer-in-the-denodo-platform/).
 
 Every benchmark or source entry should document:
 
@@ -367,6 +496,8 @@ Every benchmark or source entry should document:
 
 Real-life benchmark values must not be mixed silently with official pricing. The
 UI and docs should distinguish pricing facts from benchmark assumptions.
+Text-to-SQL accuracy values must also show metric definition and dataset/context
+so users can tell whether a benchmark matches their domain.
 
 ## Future Follow-Up Views
 
