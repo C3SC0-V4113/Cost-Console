@@ -17,3 +17,4 @@ context.
 ## ADRs
 
 - [0001-define-cost-console-as-token-and-rag-cost-playground.md](./0001-define-cost-console-as-token-and-rag-cost-playground.md)
+- [0002-define-initial-view-model-documentation.md](./0002-define-initial-view-model-documentation.md)

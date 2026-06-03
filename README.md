@@ -81,6 +81,22 @@ Administer pricing used by the calculation engine with provider/model/capability
 tables, snapshots or versions, validity state, record editing, historical
 recalculation support, and traceability for which prices fed each simulation.
 
+## Planned Views
+
+The first documented view model is defined in
+[docs/product/views.md](./docs/product/views.md). It is a product contract only:
+no routes, components, APIs, schemas, TypeScript types, calculation helpers, or
+database tables have been implemented from it yet.
+
+The planned first surfaces are:
+
+- an application shell that opens into the usable cost playground;
+- a Pricing Catalog for provider, model, token-price, cache-price, and source
+  traceability;
+- one unified Chat Cost Playground for interaction volume, token buckets, prompt
+  caching, educational helpers, saved scenarios, and day/month/year summaries;
+- future placeholder surfaces for Embeddings, Vector Query, and RAG Scenarios.
+
 ## Persistence Contract
 
 The minimum persistent domains are:
@@ -119,6 +135,7 @@ not define the first-phase product boundary.
 ## Documentation References
 
 - UI/UX standard: [DESIGN.md](./DESIGN.md)
+- Planned view specification: [docs/product/views.md](./docs/product/views.md)
 - Agent operating guide: [AGENTS.md](./AGENTS.md)
 - Local ADRs: [docs/adr/README.md](./docs/adr/README.md)
 - Project architecture guardrails: `.agents/skills/project-architecture/SKILL.md`

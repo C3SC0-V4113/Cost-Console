@@ -98,12 +98,58 @@ implementation or document the decision in a local ADR.
 ## Components And Controls
 
 - Use icons in icon-only buttons and add accessible labels.
+- Use info icons for technical labels that need concise definitions, especially
+  prompt caching, cache hit rate, cached input, cache write, system prompt
+  tokens, context tokens, token estimates, pricing snapshots, and source dates.
+- Use helper subtitles when an info icon would hide critical context, such as
+  whether a token estimate is approximate or whether a pricing row is manually
+  entered from a source.
 - Use segmented controls for modes, toggles/checkboxes for binary settings,
   inputs or sliders for numeric values, and menus for option sets.
 - Prefer `lucide-react` icons when an icon is available.
 - Keep buttons stable in width where labels can change.
 - Do not use visible text to explain how to use standard controls; labels and
   state should make the interaction clear.
+
+## Educational Helpers
+
+- Prompt caching helper text should explain that cacheable prompt prefixes or
+  repeated context may be priced differently by some providers when reused.
+- Cache hit rate helper text should define it as the percentage of eligible
+  prompt/context tokens expected to be billed as cached reads instead of regular
+  input.
+- Token estimate helper text should state that characters-per-token and page
+  estimates are rough guidance, not exact billing math.
+- A4-page estimates should be framed as approximate ranges and should not replace
+  direct token counts when a tokenizer or exact usage is available.
+- Educational copy must stay compact and close to the field or section it
+  explains; do not add long instructional panels.
+
+## Cost Summaries
+
+- Cost summaries should show per-interaction, daily, monthly, and yearly totals
+  when the scenario includes interaction volume.
+- Summary line items should separate input, output, cached input, cache
+  read/write where applicable, system prompt contribution, and carried
+  context/history contribution.
+- Day/month/year summaries must show the assumptions that produce them,
+  including interactions per day, days per month, pricing snapshot, currency, and
+  prompt cache hit percentage.
+- If a provider lacks a cache-specific price, the summary should label cache
+  pricing as unavailable or treated as regular input rather than silently
+  applying a discount.
+
+## Pricing Source Traceability
+
+- Pricing rows should expose source URL, source date, effective date, snapshot,
+  validity state, and notes when available.
+- Manual entries are acceptable only when they still carry enough source metadata
+  to explain where the price came from.
+- Stale, missing, or manually entered pricing should be labeled with text, not
+  only color.
+- System prompt cost should be calculated from system prompt token buckets and
+  the selected input/cache pricing; it should not be treated as a standalone
+  catalog price by default.
 
 ## Data Display
 
