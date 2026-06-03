@@ -43,12 +43,38 @@ Use `cmd /c npm ...` on Windows because PowerShell may block the `npm.ps1` wrapp
 
 ## Project References
 
-- Architecture summary and current app shape: `README.md`
+- Product definition, architecture target, current app shape, and scripts: `README.md`
 - UI/UX standard and visual rules: `DESIGN.md`
+- Local Architecture Decision Records: `docs/adr/`
+- Upstream portfolio documentation: `E:\Repositorios\platform-ai-architecture`
+- Upstream Cost Console project sheet: `E:\Repositorios\platform-ai-architecture\docs\projects\cost-console.md`
+- Upstream portfolio ADR for this project: `E:\Repositorios\platform-ai-architecture\docs\adr\0007-define-cost-console-as-token-and-rag-cost-playground.md`
 - Project architecture guardrails: `.agents/skills/project-architecture/SKILL.md`
 - Minimum completion verification: `.agents/skills/project-min-evaluation/SKILL.md`
 - Decision documentation sync: `.agents/skills/decision-doc-sync/SKILL.md`
 - Next.js 16 guidance: `.agents/skills/next-best-practices/SKILL.md`
+
+## Source-of-Truth Hierarchy
+
+For local Cost Console implementation work, resolve conflicts in this order:
+
+1. `DESIGN.md` for UI/UX rules.
+2. `README.md` for local product architecture and implementation contracts.
+3. `docs/adr/` for accepted local architectural decisions.
+4. `AGENTS.md` for operating workflow.
+5. `E:\Repositorios\platform-ai-architecture` for upstream portfolio context.
+
+The upstream portfolio repo remains the source for portfolio-wide context. This repository owns the local product contract and implementation decisions.
+
+Before changing structural product scope, read the local `README.md`, `DESIGN.md`, local ADRs, and the relevant upstream portfolio docs. Do not convert Cost Console into an inference gateway, static calculator, generic admin dashboard, identity service, canonical asset store, or canonical RAG corpus unless a new ADR supersedes the current decision.
+
+## Product Boundary
+
+Cost Console is a fullstack analytical playground for chat, embedding ingestion, vector query, and end-to-end RAG cost modeling.
+
+The first phase must be useful without `auth-service`, `ai-gateway`, or `knowledge-rag`. Future integrations may consume Cost Console calculations or add multi-user/private exposure, but the local calculation engine, pricing traceability, saved scenarios, and PostgreSQL-backed persistence remain the center of this project.
+
+The UI must not duplicate economic calculation logic that belongs to the backend. Internal APIs should own scenarios, pricing catalogs, snapshots, and calculation results when those features are implemented.
 
 ## Claude Code Compatibility
 
@@ -66,7 +92,8 @@ Reference hierarchy for conflicts:
 
 1. `DESIGN.md` for UI/UX rules.
 2. `README.md` for architecture and current app contracts.
-3. `AGENTS.md` for operating workflow.
+3. `docs/adr/` for accepted local structural decisions.
+4. `AGENTS.md` for operating workflow.
 
 ### Trigger Map
 
@@ -95,7 +122,7 @@ Reference hierarchy for conflicts:
 
 ### Recommended Invocation Order
 
-- New dashboard feature:
+- New dashboard or playground feature:
   - `project-architecture` -> `next-best-practices` -> `shadcn` -> `vercel-react-best-practices` -> `project-min-evaluation`
 - Component or state refactor:
   - `project-architecture` -> `typescript-advanced-types` -> `vercel-composition-patterns` -> `project-min-evaluation`
@@ -104,9 +131,18 @@ Reference hierarchy for conflicts:
 - Structural decision:
   - relevant domain flow -> `decision-doc-sync`; use `architecture-decision-records` if an ADR is needed.
 
+## Local ADR Usage
+
+- Local ADRs live under `docs/adr/`.
+- Use `NNNN-short-title.md` file names with four-digit numbering.
+- Keep accepted ADRs stable; if a decision changes, create a new ADR that supersedes the old one instead of rewriting history.
+- Reference upstream portfolio ADRs when local decisions adopt or refine portfolio-wide decisions.
+- Use local ADRs for product boundary, persistence, backend/API ownership, integration timing, quality policy, and other decisions future maintainers need to understand.
+
 ## Documentation Sync Guardrail
 
 - Keep `CLAUDE.md` as a pointer to `AGENTS.md`; do not duplicate policy blocks.
 - Do not copy UI rules from `DESIGN.md` into `AGENTS.md`; link instead.
 - Do not copy architecture contracts from `README.md` into `AGENTS.md`; link instead.
+- Do not copy the upstream portfolio repo wholesale into local docs; summarize what is needed and reference the upstream files.
 - When structural conventions change, update docs and ADRs through `decision-doc-sync`.
