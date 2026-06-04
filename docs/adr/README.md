@@ -20,3 +20,5 @@ context.
 - [0002-define-initial-view-model-documentation.md](./0002-define-initial-view-model-documentation.md)
 - [0003-define-rag-cost-lab-documentation.md](./0003-define-rag-cost-lab-documentation.md)
 - [0004-define-text-to-sql-cost-lab-documentation.md](./0004-define-text-to-sql-cost-lab-documentation.md)
+- [0005-define-postgresql-prisma-data-architecture.md](./0005-define-postgresql-prisma-data-architecture.md)
+- [0006-define-curated-pricing-and-benchmark-source-policy.md](./0006-define-curated-pricing-and-benchmark-source-policy.md)

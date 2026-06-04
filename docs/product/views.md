@@ -499,6 +499,11 @@ UI and docs should distinguish pricing facts from benchmark assumptions.
 Text-to-SQL accuracy values must also show metric definition and dataset/context
 so users can tell whether a benchmark matches their domain.
 
+The first implementation should use the curated source matrix in
+[docs/data/source-seed-catalog.md](../data/source-seed-catalog.md). Source values
+should be stored as snapshots rather than read live from pricing pages or
+leaderboards at runtime.
+
 ## Future Follow-Up Views
 
 These surfaces remain planned follow-ups and should not be treated as implemented

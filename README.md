@@ -32,8 +32,8 @@ The core product must make these costs explicit:
   `app/globals.css`.
 - Backend: internal application API that owns calculation logic for scenarios,
   catalogs, and results.
-- Persistence: PostgreSQL from the start, with Prisma expected for future data
-  access.
+- Persistence: PostgreSQL is the database contract, with Prisma accepted as the
+  future ORM, schema owner, and migration workflow.
 - Components: shared UI primitives live under `components/ui`; reusable
   application logic should stay outside route files when it grows beyond simple
   composition.
@@ -101,6 +101,21 @@ The planned first surfaces are:
   generation, validation/retry cost, optional warehouse execution cost, and
   source-backed accuracy comparison.
 
+## Database Architecture
+
+The planned data architecture is defined in
+[docs/data/database.md](./docs/data/database.md). It is an architecture contract
+only: no Docker Compose service, Prisma dependency, `schema.prisma`, migrations,
+database connection code, API routes, calculation helpers, or database tables
+have been implemented yet.
+
+The accepted direction is PostgreSQL plus Prisma, with local development planned
+around a Docker Compose `postgres` service. Pricing and benchmark sources will
+start from a curated source set documented in
+[docs/data/source-seed-catalog.md](./docs/data/source-seed-catalog.md) and ADR 0006. Remaining product and data decisions are tracked in
+[docs/discovery/open-questions.md](./docs/discovery/open-questions.md) so they
+do not get buried in implementation notes.
+
 ## Persistence Contract
 
 The minimum persistent domains are:
@@ -108,11 +123,11 @@ The minimum persistent domains are:
 - `pricing_catalog`;
 - `pricing_snapshot`;
 - `chat_cost_scenario`;
-- `embedding_ingestion_scenario`;
-- `vector_query_scenario`;
-- `rag_architecture_scenario`;
+- `rag_cost_scenario`;
+- `text_to_sql_scenario`;
+- `benchmark_result`;
 - `calculation_result`;
-- `recommendation_rule` if recommendation or scoring rules are added later;
+- `calculation_line_item`;
 - `project_scope` for future auth integration.
 
 Calculation results may be regenerated, but scenarios, pricing snapshots,
@@ -140,6 +155,10 @@ not define the first-phase product boundary.
 
 - UI/UX standard: [DESIGN.md](./DESIGN.md)
 - Planned view specification: [docs/product/views.md](./docs/product/views.md)
+- Database architecture: [docs/data/database.md](./docs/data/database.md)
+- Curated source seed catalog:
+  [docs/data/source-seed-catalog.md](./docs/data/source-seed-catalog.md)
+- Open questions: [docs/discovery/open-questions.md](./docs/discovery/open-questions.md)
 - Agent operating guide: [AGENTS.md](./AGENTS.md)
 - Local ADRs: [docs/adr/README.md](./docs/adr/README.md)
 - Project architecture guardrails: `.agents/skills/project-architecture/SKILL.md`
