@@ -79,10 +79,17 @@ Still open:
 
 ## Auth And Project Isolation
 
-- When should `auth-service` integration be introduced?
+- Resolved by ADR 0007:
+  - Cost Console uses mandatory login through `Identity-Service`.
+  - The project slug is `cost-console`.
+  - Authenticated `user` members can use the playground but cannot persist
+    scenarios or pricing snapshots.
+  - Authenticated `admin` members can access pricing snapshot administration
+    surfaces.
 - Is `project_scope` enough for the first persisted local version, or should the
   schema reserve organization, workspace, and user ownership fields immediately?
-- Are saved scenarios private by default when auth arrives?
+- If user-level scenario persistence is introduced later, should saved scenarios
+  be private by default?
 - Can future integrations read calculation results without editing scenarios?
 - Which records should be shareable templates versus project-owned private data?
 

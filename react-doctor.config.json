@@ -5,6 +5,29 @@
       {
         "files": ["lib/utils.ts"],
         "rules": ["deslop/unused-file"]
+      },
+      {
+        "files": [
+          "components/auth/access-denied-panel.tsx",
+          "components/auth/auth-client.ts",
+          "components/auth/email-form.tsx",
+          "components/auth/login-form.tsx",
+          "components/auth/register-form.tsx",
+          "components/auth/user-menu.tsx",
+          "components/console/protected-shell.tsx",
+          "components/i18n/language-selector.tsx",
+          "components/theme/theme-mode-selector.tsx",
+          "components/theme/theme-provider.tsx",
+          "i18n/actions.ts",
+          "i18n/config.ts",
+          "i18n/locale.ts",
+          "lib/auth-shared.ts",
+          "lib/auth.ts",
+          "lib/identity-client.ts",
+          "lib/pricing-snapshot-fixtures.ts",
+          "lib/roles.ts"
+        ],
+        "rules": ["deslop/unused-file"]
       }
     ]
   }

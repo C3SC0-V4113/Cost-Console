@@ -72,7 +72,11 @@ Before changing structural product scope, read the local `README.md`, `DESIGN.md
 
 Cost Console is a fullstack analytical playground for chat, embedding ingestion, vector query, and end-to-end RAG cost modeling.
 
-The first phase must be useful without `auth-service`, `ai-gateway`, or `knowledge-rag`. Future integrations may consume Cost Console calculations or add multi-user/private exposure, but the local calculation engine, pricing traceability, saved scenarios, and PostgreSQL-backed persistence remain the center of this project.
+The first phase now uses mandatory login through `Identity-Service` for the
+`cost-console` project while remaining useful without `ai-gateway` or
+`knowledge-rag`. Future integrations may consume Cost Console calculations, but
+the local calculation engine, pricing traceability, admin-managed pricing
+snapshots, and PostgreSQL-backed persistence remain the center of this project.
 
 The UI must not duplicate economic calculation logic that belongs to the backend. Internal APIs should own scenarios, pricing catalogs, snapshots, and calculation results when those features are implemented.
 

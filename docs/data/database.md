@@ -93,6 +93,8 @@ calculation line items must remain queryable first-class data.
 ### `project_scope`
 
 Represents the local project boundary and future tenant or workspace boundary.
+For the current auth decision, this aligns with the `cost-console` project
+membership enforced by `Identity-Service`.
 
 Planned fields:
 
@@ -107,6 +109,12 @@ Relationships:
 
 - Owns `scenario` records.
 - May own pricing snapshots if future tenancy requires per-project catalogs.
+
+Authorization note:
+
+- `Identity-Service` owns membership, session, and role enforcement.
+- Cost Console should consume project access state instead of duplicating
+  authentication or role assignment rules in its own database.
 
 ## Source And Benchmark Policy
 
@@ -457,7 +465,8 @@ Relationships:
 
 ## Non-Goals
 
-- No authentication or tenant enforcement is implemented by this document.
+- No local authentication authority is implemented by this document; portfolio
+  auth and role enforcement come from `Identity-Service`.
 - No production database provider is selected.
 - No runtime seed script is defined.
 - No Prisma schema is generated from this document.

@@ -13,8 +13,9 @@ local implementation contract and product-specific ADRs.
 ## Product Definition
 
 Cost Console is not a static calculator, an admin dashboard first, or an
-inference gateway. The first product phase must be useful by itself and must not
-depend on `auth-service`, `ai-gateway`, or `knowledge-rag` to demonstrate value.
+inference gateway. The first product phase must be useful by itself while using
+project-scoped authentication from `Identity-Service`. It must not depend on
+`ai-gateway` or `knowledge-rag` to demonstrate value.
 
 The core product must make these costs explicit:
 
@@ -41,10 +42,21 @@ The core product must make these costs explicit:
   Components unless state, browser APIs, or event handlers require a client
   island.
 - React Scan: loaded only in development from `app/layout.tsx`.
+- Authentication: project-scoped, cookie-based login delegated to
+  `Identity-Service` using the `cost-console` project slug, enforced by
+  Next.js 16 `proxy.ts` plus server-side route/layout guards.
 
 The UI must not duplicate economic calculation logic that belongs to the
 backend. Calculation inputs, pricing catalogs, snapshots, scenarios, and
 calculation results should flow through the internal backend contract.
+
+Authenticated access rules:
+
+- unauthenticated visitors are redirected to login;
+- authenticated `user` members can use the playground but cannot persist
+  scenarios or pricing snapshots;
+- authenticated `admin` members can open pricing snapshot administration
+  surfaces.
 
 ## Expected Product Surfaces
 
@@ -90,9 +102,11 @@ database tables have been implemented from it yet.
 
 The planned first surfaces are:
 
-- an application shell that opens into the usable cost playground;
+- an authenticated application shell that redirects unauthenticated visitors to
+  login before opening the usable cost playground;
 - a Pricing Catalog for provider, model, token-price, cache-price, and source
-  traceability;
+  traceability, eventually exposed through admin-only pricing snapshot
+  workflows;
 - one unified Chat Cost Playground for interaction volume, token buckets, prompt
   caching, educational helpers, saved scenarios, and day/month/year summaries;
 - a planned RAG Cost Lab for embedding ingestion, vector query cost, retrieval
@@ -137,17 +151,43 @@ Cost Console must not store master identity, canonical assets, or the canonical
 RAG corpus. Future integrations may consume or enrich its outputs, but they do
 not define the first-phase product boundary.
 
+## Authentication Contract
+
+Cost Console now requires login for all product routes. Authentication is
+delegated to `Identity-Service`, which owns the session cookie, project-scoped
+membership, and roles for the `cost-console` project.
+
+Current local integration contract:
+
+- `POST /projects/cost-console/auth/login`
+- `POST /projects/cost-console/auth/logout`
+- `GET /projects/cost-console/auth/session`
+- `GET /projects/cost-console/me`
+
+The frontend relays auth through same-origin BFF route handlers under
+`app/api/auth/*`, forwards `Set-Cookie` back to the browser, and treats
+Identity-Service as the authority for `user` versus `admin` access.
+
 ## Current Implementation State
 
-- `app/layout.tsx` defines metadata, fonts, root HTML/body structure, and the
-  development React Scan script.
-- `app/page.tsx` is still a starter page and should be replaced by the first real
-  Cost Console playground surface.
-- `components/ui/button.tsx` contains the current shadcn-style button primitive.
-- `tests/unit/home-page.smoke.test.tsx` is the current smoke test for the starter
-  page.
-- `tests/e2e/example.spec.ts` is still a Playwright starter test and should be
-  replaced with app-specific E2E coverage when the first real workflow lands.
+- `app/layout.tsx` defines metadata, fonts, root HTML/body structure,
+  `NextIntlClientProvider`, `next-themes`, the toaster, and the development
+  React Scan script.
+- `proxy.ts` validates the Identity-Service session cookie before private
+  product routes render and fails closed when Identity-Service is unavailable.
+- `app/login/*` implements the server-rendered auth surface: email check,
+  password login, registration, and auth-only layout with language/theme controls.
+- `app/(private)/layout.tsx` hosts the authenticated console shell;
+  `app/(private)/page.tsx` is the protected playground entrypoint.
+- `app/(private)/settings/account/page.tsx` shows the current project profile.
+- `app/api/auth/*` relays Identity-Service email-check, login, register, and
+  logout through same-origin responses.
+- `app/(private)/pricing-snapshots/*` scaffolds admin-only pricing snapshot
+  surfaces; `app/api/pricing-snapshots/*` keeps the backend guards.
+- `components/theme/*`, `components/i18n/*`, and `messages/*` provide the theme
+  and language selectors aligned with `other-gpt`.
+- `tests/unit/login-page.test.tsx`, `tests/unit/console-home-page.test.tsx`, and
+  `tests/e2e/auth-gate.spec.ts` cover the auth shell baseline.
 - No PostgreSQL, Prisma, internal API, scenario schema, or calculation engine has
   been implemented yet.
 
@@ -173,6 +213,9 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Copy `env.example` to `.env.local`, then set `IDENTITY_URL` to the running
+`Identity-Service` base URL before using the login flow.
 
 Use `cmd /c npm ...` on Windows shells where PowerShell blocks `npm.ps1`.
 

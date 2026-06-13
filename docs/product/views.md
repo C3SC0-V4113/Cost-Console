@@ -21,10 +21,21 @@ APIs, schemas, TypeScript types, calculation helpers, tests, or database tables.
 The planned application shell should provide persistent navigation and product
 context without becoming a separate dashboard surface.
 
+Authentication contract:
+
+- the app requires login before any playground route renders;
+- login is delegated to `Identity-Service` for the `cost-console` project;
+- authenticated `user` members can use playground routes but not persist or
+  administer pricing snapshots;
+- authenticated `admin` members can open pricing snapshot administration
+  surfaces;
+- the authenticated shell exposes account/profile access plus theme and language
+  selectors.
+
 Planned navigation:
 
 - `Chat Cost`;
-- `Pricing Catalog`;
+- `Pricing Catalog` (admin surface for snapshot administration);
 - `RAG Cost Lab`;
 - `Text-to-SQL Cost Lab`;
 - future `Embeddings`;
@@ -35,11 +46,17 @@ The root product intent is to open into `Chat Cost`, the usable cost playground.
 Future placeholder entries may exist in documentation and navigation plans, but
 they should not imply implemented routes until runtime work begins.
 
+Unauthenticated requests should be redirected to the login flow before this
+navigation is shown.
+
 The header should eventually expose:
 
 - active pricing snapshot;
 - active currency;
 - pricing freshness or last updated date;
+- account/profile menu;
+- theme selector;
+- language selector;
 - scenario dirty/saved state when a scenario is being edited.
 
 ## Pricing Catalog
@@ -47,6 +64,10 @@ The header should eventually expose:
 The Pricing Catalog defines provider and model pricing used by the calculation
 engine. Manual entries are allowed, but source metadata is required for
 traceability.
+
+This surface is admin-only. Normal authenticated users may see the active
+snapshot metadata used for calculations, but they cannot list, create, or view
+administrative snapshot screens.
 
 Planned table fields:
 
@@ -166,6 +187,13 @@ The summary must show the assumptions behind the rollup:
 
 Saved scenario support is planned inside the Chat Cost Playground rather than as
 a separate first-phase route.
+
+Current access rule direction:
+
+- normal authenticated users do not persist scenarios in the initial auth-aware
+  implementation;
+- future saved-scenario persistence must define explicit ownership and privacy
+  rules before it is enabled.
 
 Planned scenario fields:
 

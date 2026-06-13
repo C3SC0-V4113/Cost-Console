@@ -1,0 +1,106 @@
+'use client';
+
+import { Check, Laptop, Moon, Sun } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useTheme } from 'next-themes';
+import { useSyncExternalStore } from 'react';
+
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+
+type ThemeMode = 'dark' | 'light' | 'system';
+
+const themeModes: Array<{
+  icon: typeof Sun;
+  labelKey: 'dark' | 'light' | 'system';
+  value: ThemeMode;
+}> = [
+  { icon: Laptop, labelKey: 'system', value: 'system' },
+  { icon: Sun, labelKey: 'light', value: 'light' },
+  { icon: Moon, labelKey: 'dark', value: 'dark' },
+];
+
+export function ThemeModeMenuItems() {
+  const t = useTranslations('themeSelector');
+  const { setTheme, theme } = useTheme();
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+
+  return (
+    <>
+      <DropdownMenuLabel>{t('label')}</DropdownMenuLabel>
+      <DropdownMenuSeparator />
+      {themeModes.map((mode) => {
+        const ModeIcon = mode.icon;
+        const isActive = isMounted && theme === mode.value;
+
+        return (
+          <DropdownMenuItem
+            key={mode.value}
+            onClick={() => {
+              setTheme(mode.value);
+            }}
+          >
+            <ModeIcon />
+            <span>{t(mode.labelKey)}</span>
+            {isActive ? <Check className="ml-auto" /> : null}
+          </DropdownMenuItem>
+        );
+      })}
+    </>
+  );
+}
+
+export function ThemeModeSelector() {
+  const t = useTranslations('themeSelector');
+  const { resolvedTheme } = useTheme();
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const isDarkTheme = isMounted && resolvedTheme === 'dark';
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          aria-label={t('ariaLabel')}
+          className="relative shadow-sm"
+          size="icon-sm"
+          type="button"
+          variant="outline"
+        >
+          <span aria-hidden="true" className="relative size-4">
+            <Sun
+              className={cn(
+                'absolute inset-0 transition-[opacity,transform] duration-180 [transition-timing-function:cubic-bezier(0.215,0.61,0.355,1)] motion-reduce:transition-none',
+                isDarkTheme ? 'scale-75 rotate-45 opacity-0' : 'scale-100 rotate-0 opacity-100'
+              )}
+            />
+            <Moon
+              className={cn(
+                'absolute inset-0 transition-[opacity,transform] duration-150 [transition-timing-function:cubic-bezier(0.215,0.61,0.355,1)] motion-reduce:transition-none',
+                isDarkTheme ? 'scale-100 rotate-0 opacity-100' : 'scale-75 -rotate-45 opacity-0'
+              )}
+            />
+          </span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <ThemeModeMenuItems />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

@@ -22,3 +22,4 @@ context.
 - [0004-define-text-to-sql-cost-lab-documentation.md](./0004-define-text-to-sql-cost-lab-documentation.md)
 - [0005-define-postgresql-prisma-data-architecture.md](./0005-define-postgresql-prisma-data-architecture.md)
 - [0006-define-curated-pricing-and-benchmark-source-policy.md](./0006-define-curated-pricing-and-benchmark-source-policy.md)
+- [0007-adopt-identity-service-login-and-admin-managed-pricing-snapshots.md](./0007-adopt-identity-service-login-and-admin-managed-pricing-snapshots.md)
