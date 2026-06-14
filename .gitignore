@@ -52,3 +52,6 @@ node_modules/
 /.claude/skills/
 .atl/.skill-registry.cache.json
 .atl/skill-registry.md
+
+# prisma generated client
+/lib/generated/

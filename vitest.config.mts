@@ -8,7 +8,14 @@ const rootDirectory = fileURLToPath(new URL('.', import.meta.url));
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: [{ find: '@', replacement: rootDirectory }],
+    alias: [
+      { find: '@', replacement: rootDirectory },
+      // `server-only` only resolves under the React Server condition; stub it in tests.
+      {
+        find: /^server-only$/,
+        replacement: fileURLToPath(new URL('./tests/test-stubs/server-only.ts', import.meta.url)),
+      },
+    ],
   },
   test: {
     environment: 'jsdom',

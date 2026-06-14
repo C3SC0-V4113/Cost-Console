@@ -4,6 +4,7 @@ dist
 build
 coverage
 out
+lib/generated
 *.min.js
 *.min.css
 pnpm-lock.yaml

@@ -168,6 +168,8 @@ const eslintConfig = defineConfig([
     '.claude/**',
     'playwright-report/**',
     'test-results/**',
+    // Prisma Client is generated code.
+    'lib/generated/**',
   ]),
 ]);
 

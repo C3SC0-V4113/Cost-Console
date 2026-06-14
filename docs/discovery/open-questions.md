@@ -7,15 +7,20 @@ schemas, migrations, APIs, or operational behavior.
 
 ## Database Hosting
 
-- Which production PostgreSQL provider will be used first?
-- Will production use a managed PostgreSQL service, a platform-provided database,
-  or self-hosted infrastructure?
+Resolved by ADR 0008:
+
+- The first production PostgreSQL provider is Supabase (managed service).
+- Local development uses a Docker Compose `postgres:18-alpine` service on host
+  port 5433 (5432 is taken by Identity-Service), with the volume mounted at
+  `/var/lib/postgresql` for the PostgreSQL 18 layout.
+- Runtime uses connection pooling via `DATABASE_URL`; migrations use `DIRECT_URL`.
+- The local reset workflow is `npm run db:reset`; seed is `npm run db:seed`.
+
+Still open:
+
 - Will preview environments each receive isolated databases?
 - What backup, point-in-time recovery, and retention policy is required?
-- Will the app need read replicas or connection pooling in the first deployed
-  phase?
-- What is the local reset and seed workflow once Docker Compose and Prisma are
-  implemented?
+- Will the app need read replicas in the first deployed phase?
 
 ## Prisma And Schema Implementation
 
@@ -24,13 +29,17 @@ Resolved by ADR 0006:
 - Money and rates should use high-precision decimal fields. Tokens, requests,
   documents, chunks, and similar counted quantities remain integers.
 
+Resolved by ADR 0008:
+
+- Prisma enums are used for bounded, stable domains (snapshot status, freshness,
+  source type, capability, validity, scenario kind, scenario status, benchmark
+  kind, line-item category, semantic-layer mode).
+- Money/rates use `Decimal(18,8)`, percentages `Decimal(5,2)`/`(5,4)`, counts
+  `Int`.
+- Scenario subtype tables remain separate (one subtype row per scenario kind).
+
 Still open:
 
-- Should Prisma enums be used for scenario kind, line-item category, source type,
-  and status, or should constrained strings be preferred for easier future
-  extension?
-- Should scenario subtype tables remain separate, or should some calculator
-  inputs be consolidated into JSON columns?
 - Which PostgreSQL indexes are required for scenario comparison, catalog lookup,
   source search, and calculation-result history?
 - Which advanced PostgreSQL features, if any, require custom SQL migrations?
@@ -106,14 +115,17 @@ Still open:
 
 ## Future Implementation Order
 
-- Should the first implementation build the Pricing Catalog and pricing snapshots
-  before the Chat Cost Playground?
-- Should PostgreSQL, Prisma, and migrations land before any calculator UI is
-  replaced?
-- Should the Chat Cost Playground be implemented before RAG Cost Lab and
-  Text-to-SQL Cost Lab?
+Resolved (vertical-slice implementation plan):
+
+- PostgreSQL, Prisma, and the initial migration land first, before any calculator
+  UI is built.
+- The Chat Cost Playground is implemented first (vertical slice), before the
+  Pricing Catalog, RAG Cost Lab, and Text-to-SQL Cost Lab.
+- Docker Compose and the local seed are introduced alongside the initial Prisma
+  schema (schema first, then the cited seed).
+
+Still open:
+
 - Which view needs saved scenarios first?
 - Should benchmark management be a standalone admin-like view or remain embedded
   in calculator flows until the catalog matures?
-- Should Docker Compose and local seed data be introduced in the same change as
-  the initial Prisma schema?

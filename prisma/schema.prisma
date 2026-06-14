@@ -1,0 +1,365 @@
+// Cost Console persistence schema.
+// Source contract: docs/data/database.md (ADR 0005). Money/rates use Decimal,
+// counted quantities use Int, and source/benchmark metadata stays first-class.
+// Prisma is the schema owner; see ADR 0008 for the implementation decisions.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  // Prisma 7 moves connection URLs out of the schema. Migrate reads the URL from
+  // prisma.config.ts; the runtime client receives a `pg` driver adapter.
+  provider = "postgresql"
+}
+
+enum SnapshotStatus {
+  draft
+  active
+  superseded
+  archived
+}
+
+enum FreshnessState {
+  fresh
+  stale
+  review
+}
+
+enum SourceType {
+  official_pricing
+  official_docs
+  third_party_benchmark
+  vendor_benchmark
+  internal_manual
+}
+
+enum ModelCapability {
+  chat
+  embedding
+  reranking
+  image
+}
+
+enum ValidityState {
+  active
+  stale
+  manual
+}
+
+enum ScenarioKind {
+  chat
+  rag
+  text_to_sql
+}
+
+enum ScenarioStatus {
+  draft
+  saved
+  archived
+  template
+}
+
+enum BenchmarkKind {
+  rag_retrieval
+  text_to_sql_accuracy
+  semantic_layer_accuracy
+}
+
+enum LineItemCategory {
+  input
+  output
+  cached_input
+  cache_write
+  embedding_ingestion
+  query_embedding
+  retrieved_context
+  warehouse_execution
+  storage
+}
+
+enum SemanticLayerMode {
+  none
+  headless
+  native
+}
+
+model ProjectScope {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  status    String     @default("active")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  scenarios Scenario[]
+
+  @@map("project_scope")
+}
+
+model SourceReference {
+  id               String     @id @default(cuid())
+  sourceType       SourceType
+  title            String
+  url              String
+  sourceDate       DateTime?
+  retrievedAt      DateTime
+  provider         String?
+  toolOrDataset    String?
+  metricName       String?
+  metricDefinition String?
+  assumptions      Json?
+  notes            String?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  pricingSnapshots     PricingSnapshot[]
+  pricingCatalogs      PricingCatalog[]
+  benchmarkResults     BenchmarkResult[]
+  calculationLineItems CalculationLineItem[]
+
+  @@index([sourceType])
+  @@map("source_reference")
+}
+
+model PricingSnapshot {
+  id                String         @id @default(cuid())
+  name              String
+  currency          String
+  status            SnapshotStatus @default(draft)
+  capturedAt        DateTime
+  validFrom         DateTime?
+  validTo           DateTime?
+  freshnessState    FreshnessState @default(fresh)
+  sourceReferenceId String?
+  notes             String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  sourceReference    SourceReference?    @relation(fields: [sourceReferenceId], references: [id])
+  pricingCatalogs    PricingCatalog[]
+  scenarios          Scenario[]
+  calculationResults CalculationResult[]
+
+  @@index([status])
+  @@map("pricing_snapshot")
+}
+
+model PricingCatalog {
+  id                   String          @id @default(cuid())
+  pricingSnapshotId    String
+  sourceReferenceId    String?
+  provider             String
+  model                String
+  capability           ModelCapability
+  contextWindowTokens  Int?
+  currency             String
+  priceUnit            String
+  inputPrice           Decimal?        @db.Decimal(18, 8)
+  outputPrice          Decimal?        @db.Decimal(18, 8)
+  cachedInputReadPrice Decimal?        @db.Decimal(18, 8)
+  cacheWritePrice      Decimal?        @db.Decimal(18, 8)
+  embeddingPrice       Decimal?        @db.Decimal(18, 8)
+  validityState        ValidityState   @default(active)
+  notes                String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  pricingSnapshot PricingSnapshot  @relation(fields: [pricingSnapshotId], references: [id], onDelete: Cascade)
+  sourceReference SourceReference? @relation(fields: [sourceReferenceId], references: [id])
+
+  @@index([pricingSnapshotId])
+  @@index([provider, model])
+  @@map("pricing_catalog")
+}
+
+model Scenario {
+  id                String         @id @default(cuid())
+  projectScopeId    String
+  pricingSnapshotId String
+  kind              ScenarioKind
+  name              String
+  label             String?
+  status            ScenarioStatus @default(draft)
+  description       String?
+  notes             String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  projectScope      ProjectScope        @relation(fields: [projectScopeId], references: [id])
+  pricingSnapshot   PricingSnapshot     @relation(fields: [pricingSnapshotId], references: [id])
+  chatCostScenario  ChatCostScenario?
+  ragCostScenario   RagCostScenario?
+  textToSqlScenario TextToSqlScenario?
+  calculationResults CalculationResult[]
+
+  @@index([kind])
+  @@index([projectScopeId])
+  @@map("scenario")
+}
+
+model ChatCostScenario {
+  id                       String   @id @default(cuid())
+  scenarioId               String   @unique
+  provider                 String
+  model                    String
+  interactionsPerDay       Int
+  daysPerMonth             Int
+  systemPromptTokens       Int
+  userInputTokens          Int
+  historyContextTokens     Int
+  cachedInputTokens        Int
+  outputTokens             Int
+  promptCacheHitPercentage Decimal  @db.Decimal(5, 2)
+  assumptions              Json?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  scenario Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@map("chat_cost_scenario")
+}
+
+model RagCostScenario {
+  id                          String   @id @default(cuid())
+  scenarioId                  String   @unique
+  documentCount               Int
+  averageDocumentTokens       Int
+  cleanupRatio                Decimal  @db.Decimal(5, 4)
+  chunkSizeTokens             Int
+  chunkOverlapTokens          Int
+  embeddingProvider           String
+  embeddingModel              String
+  expectedChunks              Int?
+  totalEmbeddingTokens        Int?
+  ingestionBatchAssumptions   Json?
+  vectorStoreProvider         String?
+  vectorDimensions            Int?
+  storageUnit                 String?
+  storageCost                 Decimal? @db.Decimal(18, 8)
+  storageSourceReferenceId    String?
+  queriesPerDay               Int
+  daysPerMonth                Int
+  averageQueryTokens          Int
+  queryEmbeddingModel         String
+  topK                        Int
+  averageRetrievedChunkTokens Int
+  scoreThreshold              Decimal? @db.Decimal(5, 4)
+  hybridSemanticWeight        Decimal? @db.Decimal(5, 4)
+  hybridTextWeight            Decimal? @db.Decimal(5, 4)
+  finalLlmProvider            String
+  finalLlmModel               String
+  systemPromptTokens          Int
+  retrievedContextTokens      Int
+  expectedOutputTokens        Int
+  promptCacheHitPercentage    Decimal  @db.Decimal(5, 2)
+  assumptions                 Json?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  scenario Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@map("rag_cost_scenario")
+}
+
+model TextToSqlScenario {
+  id                              String            @id @default(cuid())
+  scenarioId                      String            @unique
+  provider                        String
+  model                           String
+  questionsPerDay                 Int
+  daysPerMonth                    Int
+  questionTokens                  Int
+  schemaContextTokens             Int
+  semanticMetadataTokens          Int
+  sqlOutputTokens                 Int
+  validationPromptTokens          Int
+  averageRetryAttempts            Decimal           @db.Decimal(6, 2)
+  promptCacheHitPercentage        Decimal           @db.Decimal(5, 2)
+  semanticLayerMode               SemanticLayerMode @default(none)
+  semanticDefinitionsIncluded     Json?
+  semanticLayerSourceReferenceId  String?
+  benchmarkPreset                 String?
+  accuracyMetricType              String?
+  baselineAccuracy                Decimal?          @db.Decimal(6, 4)
+  semanticLayerAccuracy           Decimal?          @db.Decimal(6, 4)
+  accuracySourceReferenceId       String?
+  warehouseProvider               String?
+  warehousePriceUnit              String?
+  averageWarehouseExecutionCost   Decimal?          @db.Decimal(18, 8)
+  warehouseSourceReferenceId      String?
+  assumptions                     Json?
+  createdAt                       DateTime          @default(now())
+  updatedAt                       DateTime          @updatedAt
+
+  scenario Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@map("text_to_sql_scenario")
+}
+
+model BenchmarkResult {
+  id                String        @id @default(cuid())
+  sourceReferenceId String
+  benchmarkKind     BenchmarkKind
+  provider          String?
+  model             String?
+  datasetOrScenario String?
+  metricType        String
+  metricValue       Decimal       @db.Decimal(12, 4)
+  metricUnit        String?
+  isOfficial        Boolean       @default(false)
+  notes             String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  sourceReference SourceReference @relation(fields: [sourceReferenceId], references: [id])
+
+  @@index([benchmarkKind])
+  @@map("benchmark_result")
+}
+
+model CalculationResult {
+  id                  String                @id @default(cuid())
+  scenarioId          String
+  pricingSnapshotId   String
+  resultVersion       Int                   @default(1)
+  calculatedAt        DateTime              @default(now())
+  currency            String
+  costPerInteraction  Decimal?              @db.Decimal(18, 8)
+  dailyCost           Decimal?              @db.Decimal(18, 8)
+  monthlyCost         Decimal?              @db.Decimal(18, 8)
+  yearlyCost          Decimal?              @db.Decimal(18, 8)
+  oneTimeCost         Decimal?              @db.Decimal(18, 8)
+  totalMonthlyEstimate Decimal?             @db.Decimal(18, 8)
+  totalYearlyEstimate Decimal?              @db.Decimal(18, 8)
+  inputHash           String
+  summary             Json?
+  createdAt           DateTime              @default(now())
+
+  scenario        Scenario              @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  pricingSnapshot PricingSnapshot       @relation(fields: [pricingSnapshotId], references: [id])
+  lineItems       CalculationLineItem[]
+
+  @@index([scenarioId])
+  @@map("calculation_result")
+}
+
+model CalculationLineItem {
+  id                  String           @id @default(cuid())
+  calculationResultId String
+  category            LineItemCategory
+  label               String
+  unit                String
+  quantity            Decimal          @db.Decimal(20, 4)
+  unitPrice           Decimal          @db.Decimal(18, 8)
+  cost                Decimal          @db.Decimal(18, 8)
+  sourceReferenceId   String?
+  notes               String?
+  createdAt           DateTime         @default(now())
+
+  calculationResult CalculationResult @relation(fields: [calculationResultId], references: [id], onDelete: Cascade)
+  sourceReference   SourceReference?  @relation(fields: [sourceReferenceId], references: [id])
+
+  @@index([calculationResultId])
+  @@map("calculation_line_item")
+}

@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: cost_console_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: cost_console
+      POSTGRES_USER: cost_console
+      POSTGRES_PASSWORD: cost_console
+    ports:
+      # Host 5433 because Identity-Service already uses 5432 on this dev machine.
+      - '5433:5432'
+    volumes:
+      # postgres:18+ stores data under version-specific subdirectories, so the
+      # volume mounts at /var/lib/postgresql (not /var/lib/postgresql/data).
+      - cost_console_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cost_console -d cost_console']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  cost_console_pgdata:
