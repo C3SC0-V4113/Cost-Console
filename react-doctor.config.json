@@ -3,7 +3,7 @@
     "files": [".agents/**", ".claude/**", "components/ui/**"],
     "overrides": [
       {
-        "files": ["lib/utils.ts"],
+        "files": ["lib/utils.ts", "lib/calc/chat-cost.ts"],
         "rules": ["deslop/unused-file"]
       },
       {
@@ -23,8 +23,10 @@
           "i18n/locale.ts",
           "lib/auth-shared.ts",
           "lib/auth.ts",
+          "lib/data/dto.ts",
+          "lib/data/pricing-repository.ts",
+          "lib/format.ts",
           "lib/identity-client.ts",
-          "lib/pricing-snapshot-fixtures.ts",
           "lib/prisma.ts",
           "lib/roles.ts"
         ],

@@ -3,9 +3,11 @@ import Link from 'next/link';
 import { AccessDeniedPanel } from '@/components/auth/access-denied-panel';
 import { Button } from '@/components/ui/button';
 import { getCurrentUser } from '@/lib/auth';
-import { pricingSnapshotFixtures } from '@/lib/pricing-snapshot-fixtures';
+import { listSnapshots } from '@/lib/data/pricing-repository';
+import { formatDate } from '@/lib/format';
 import { canManagePricingSnapshots } from '@/lib/roles';
 
+import type { PricingSnapshotDTO } from '@/lib/data/dto';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
   description: 'Admin-only pricing snapshot surface for Cost Console.',
 };
 
-function PricingSnapshotsContent() {
+function PricingSnapshotsContent({ snapshots }: Readonly<{ snapshots: PricingSnapshotDTO[] }>) {
   return (
     <div className="grid gap-6">
       <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm md:flex-row md:items-center md:justify-between">
@@ -44,22 +46,28 @@ function PricingSnapshotsContent() {
           <span>Captured</span>
         </div>
         <div className="divide-y divide-border">
-          {pricingSnapshotFixtures.map((snapshot) => (
-            <Link
-              key={snapshot.id}
-              href={`/pricing-snapshots/${snapshot.id}`}
-              className="grid grid-cols-[1.6fr_repeat(4,minmax(0,1fr))] gap-4 px-6 py-4 text-sm transition-colors hover:bg-muted/40"
-            >
-              <div className="grid gap-1">
-                <span className="font-medium text-foreground">{snapshot.name}</span>
-                <span className="text-muted-foreground">{snapshot.notes}</span>
-              </div>
-              <span className="text-foreground">{snapshot.status}</span>
-              <span className="text-foreground">{snapshot.currency}</span>
-              <span className="text-foreground">{snapshot.freshnessState}</span>
-              <span className="text-foreground">{snapshot.capturedAtLabel}</span>
-            </Link>
-          ))}
+          {snapshots.length === 0 ? (
+            <p className="p-6 text-sm text-muted-foreground">
+              No pricing snapshots have been captured yet.
+            </p>
+          ) : (
+            snapshots.map((snapshot) => (
+              <Link
+                key={snapshot.id}
+                href={`/pricing-snapshots/${snapshot.id}`}
+                className="grid grid-cols-[1.6fr_repeat(4,minmax(0,1fr))] gap-4 px-6 py-4 text-sm transition-colors hover:bg-muted/40"
+              >
+                <div className="grid gap-1">
+                  <span className="font-medium text-foreground">{snapshot.name}</span>
+                  <span className="text-muted-foreground">{snapshot.notes}</span>
+                </div>
+                <span className="text-foreground">{snapshot.status}</span>
+                <span className="text-foreground">{snapshot.currency}</span>
+                <span className="text-foreground">{snapshot.freshnessState}</span>
+                <span className="text-foreground">{formatDate(snapshot.capturedAt)}</span>
+              </Link>
+            ))
+          )}
         </div>
       </section>
     </div>
@@ -68,9 +76,11 @@ function PricingSnapshotsContent() {
 
 export default async function PricingSnapshotsPage() {
   const user = await getCurrentUser();
-  return user && canManagePricingSnapshots(user) ? (
-    <PricingSnapshotsContent />
-  ) : (
-    <AccessDeniedPanel />
-  );
+  if (!user || !canManagePricingSnapshots(user)) {
+    return <AccessDeniedPanel />;
+  }
+
+  const snapshots = await listSnapshots();
+
+  return <PricingSnapshotsContent snapshots={snapshots} />;
 }

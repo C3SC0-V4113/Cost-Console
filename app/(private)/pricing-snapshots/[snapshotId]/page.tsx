@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation';
 
 import { AccessDeniedPanel } from '@/components/auth/access-denied-panel';
 import { getCurrentUser } from '@/lib/auth';
-import { getPricingSnapshotFixtureById } from '@/lib/pricing-snapshot-fixtures';
+import { getSnapshotById, listCatalog } from '@/lib/data/pricing-repository';
+import { formatDate } from '@/lib/format';
 import { canManagePricingSnapshots } from '@/lib/roles';
 
 import type { Metadata } from 'next';
@@ -17,11 +18,16 @@ async function PricingSnapshotDetailContent({
 }: Readonly<{
   snapshotId: string;
 }>) {
-  const snapshot = getPricingSnapshotFixtureById(snapshotId);
+  const [snapshot, catalog] = await Promise.all([
+    getSnapshotById(snapshotId),
+    listCatalog(snapshotId),
+  ]);
 
   if (!snapshot) {
     notFound();
   }
+
+  const providers = [...new Set(catalog.map((row) => row.provider))];
 
   return (
     <div className="grid gap-6">
@@ -50,15 +56,19 @@ async function PricingSnapshotDetailContent({
         </div>
         <div className="rounded-xl border border-border bg-background p-4">
           <p className="text-sm text-muted-foreground">Captured at</p>
-          <p className="mt-1 font-medium text-foreground">{snapshot.capturedAtLabel}</p>
+          <p className="mt-1 font-medium text-foreground">{formatDate(snapshot.capturedAt)}</p>
         </div>
         <div className="rounded-xl border border-border bg-background p-4">
           <p className="text-sm text-muted-foreground">Valid from</p>
-          <p className="mt-1 font-medium text-foreground">{snapshot.validFromLabel}</p>
+          <p className="mt-1 font-medium text-foreground">{formatDate(snapshot.validFrom)}</p>
         </div>
         <div className="rounded-xl border border-border bg-background p-4">
-          <p className="text-sm text-muted-foreground">Source summary</p>
-          <p className="mt-1 font-medium text-foreground">{snapshot.sourceSummary}</p>
+          <p className="text-sm text-muted-foreground">Catalog coverage</p>
+          <p className="mt-1 font-medium text-foreground">
+            {providers.length > 0
+              ? `${catalog.length} rows · ${providers.join(', ')}`
+              : 'No catalog rows'}
+          </p>
         </div>
       </section>
     </div>

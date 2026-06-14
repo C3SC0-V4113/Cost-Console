@@ -19,6 +19,12 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    env: {
+      // lib/prisma requires DATABASE_URL at import time; the client is mocked in
+      // unit tests, so this dummy value never opens a real connection.
+      // eslint-disable-next-line @typescript-eslint/naming-convention -- environment variable name
+      DATABASE_URL: 'postgresql://cost_console:cost_console@localhost:5433/cost_console',
+    },
     include: ['tests/unit/**/*.test.{ts,tsx}', 'tests/integration/**/*.test.{ts,tsx}'],
     restoreMocks: true,
   },

@@ -1,5 +1,5 @@
 import { requireAdminAccess } from '@/lib/auth';
-import { pricingSnapshotFixtures } from '@/lib/pricing-snapshot-fixtures';
+import { listSnapshots } from '@/lib/data/pricing-repository';
 
 export async function GET(): Promise<Response> {
   const guard = await requireAdminAccess();
@@ -8,7 +8,9 @@ export async function GET(): Promise<Response> {
     return guard;
   }
 
-  return Response.json({ data: pricingSnapshotFixtures });
+  const data = await listSnapshots();
+
+  return Response.json({ data });
 }
 
 export async function POST(): Promise<Response> {

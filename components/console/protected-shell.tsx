@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import { AccessDeniedPanel } from '@/components/auth/access-denied-panel';
 import { UserMenu } from '@/components/auth/user-menu';
 import { getCurrentUser, getProjectAccess } from '@/lib/auth';
-import { activePricingSnapshot } from '@/lib/pricing-snapshot-fixtures';
+import { getActiveSnapshot } from '@/lib/data/pricing-repository';
+import { formatDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 export async function ProtectedShell({
@@ -16,12 +17,18 @@ export async function ProtectedShell({
 }>) {
   let user = null;
   let access = null;
+  let snapshot = null;
 
   try {
-    [user, access] = await Promise.all([getCurrentUser(), getProjectAccess()]);
+    [user, access, snapshot] = await Promise.all([
+      getCurrentUser(),
+      getProjectAccess(),
+      getActiveSnapshot().catch(() => null),
+    ]);
   } catch {
     user = null;
     access = null;
+    snapshot = null;
   }
 
   if (!user || !access) {
@@ -68,14 +75,20 @@ export async function ProtectedShell({
 
           <div className="flex flex-col items-start gap-4 lg:items-end">
             <div className="grid gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-sm">
-              <p className="font-medium text-card-foreground">
-                Active snapshot: {activePricingSnapshot.name}
-              </p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
-                <span>{activePricingSnapshot.currency}</span>
-                <span>{activePricingSnapshot.freshnessState}</span>
-                <span>{activePricingSnapshot.capturedAtLabel}</span>
-              </div>
+              {snapshot ? (
+                <>
+                  <p className="font-medium text-card-foreground">
+                    Active snapshot: {snapshot.name}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+                    <span>{snapshot.currency}</span>
+                    <span>{snapshot.freshnessState}</span>
+                    <span>Captured {formatDate(snapshot.capturedAt)}</span>
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground">No active pricing snapshot</p>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-3">

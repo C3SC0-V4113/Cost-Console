@@ -1,7 +1,9 @@
 import { ShieldCheck, SlidersHorizontal, WalletCards } from 'lucide-react';
 
-import { activePricingSnapshot } from '@/lib/pricing-snapshot-fixtures';
+import { getActiveSnapshot } from '@/lib/data/pricing-repository';
+import { formatDate } from '@/lib/format';
 
+import type { PricingSnapshotDTO } from '@/lib/data/dto';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -30,7 +32,7 @@ const overviewCards = [
   },
 ];
 
-function HomeContent() {
+function HomeContent({ snapshot }: Readonly<{ snapshot: PricingSnapshotDTO | null }>) {
   return (
     <div className="grid gap-6">
       <section className="grid gap-3 rounded-2xl border border-border bg-card p-6 shadow-sm">
@@ -80,22 +82,22 @@ function HomeContent() {
           <dl className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-xl border border-border bg-background p-4">
               <dt className="text-sm text-muted-foreground">Snapshot</dt>
-              <dd className="mt-1 font-medium text-foreground">{activePricingSnapshot.name}</dd>
+              <dd className="mt-1 font-medium text-foreground">{snapshot?.name ?? '—'}</dd>
             </div>
             <div className="rounded-xl border border-border bg-background p-4">
               <dt className="text-sm text-muted-foreground">Status</dt>
-              <dd className="mt-1 font-medium text-foreground">{activePricingSnapshot.status}</dd>
+              <dd className="mt-1 font-medium text-foreground">{snapshot?.status ?? '—'}</dd>
             </div>
             <div className="rounded-xl border border-border bg-background p-4">
               <dt className="text-sm text-muted-foreground">Freshness</dt>
               <dd className="mt-1 font-medium text-foreground">
-                {activePricingSnapshot.freshnessState}
+                {snapshot?.freshnessState ?? '—'}
               </dd>
             </div>
             <div className="rounded-xl border border-border bg-background p-4">
               <dt className="text-sm text-muted-foreground">Captured</dt>
               <dd className="mt-1 font-medium text-foreground">
-                {activePricingSnapshot.capturedAtLabel}
+                {formatDate(snapshot?.capturedAt ?? null)}
               </dd>
             </div>
           </dl>
@@ -121,5 +123,7 @@ function HomeContent() {
 }
 
 export default async function HomePage() {
-  return <HomeContent />;
+  const snapshot = await getActiveSnapshot().catch(() => null);
+
+  return <HomeContent snapshot={snapshot} />;
 }

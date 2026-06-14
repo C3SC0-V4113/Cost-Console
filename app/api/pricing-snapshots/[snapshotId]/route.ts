@@ -1,5 +1,5 @@
 import { requireAdminAccess } from '@/lib/auth';
-import { getPricingSnapshotFixtureById } from '@/lib/pricing-snapshot-fixtures';
+import { getSnapshotById } from '@/lib/data/pricing-repository';
 
 export async function GET(
   request: Request,
@@ -13,7 +13,7 @@ export async function GET(
   }
 
   const { snapshotId } = await params;
-  const snapshot = getPricingSnapshotFixtureById(snapshotId);
+  const snapshot = await getSnapshotById(snapshotId);
 
   if (!snapshot) {
     return Response.json(
