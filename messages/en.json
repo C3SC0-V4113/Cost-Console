@@ -1,4 +1,51 @@
 {
+  "help": {
+    "promptCaching": {
+      "label": "What is prompt caching?",
+      "body": "Repeated prompt prefixes or context may be reused and priced differently by some providers when sent again.",
+      "sourceLabel": "OpenAI prompt caching docs"
+    },
+    "cacheHitRate": {
+      "label": "What is cache hit rate?",
+      "body": "The percentage of eligible prompt or context tokens expected to be billed as cached reads instead of regular input."
+    },
+    "cachedInput": {
+      "label": "What is cached input?",
+      "body": "Tokens expected to use cached-read pricing instead of standard input pricing."
+    },
+    "cacheWrite": {
+      "label": "What is cache write?",
+      "body": "Provider-specific cost, if any, to establish cacheable content the first time."
+    },
+    "systemPromptTokens": {
+      "label": "What are system prompt tokens?",
+      "body": "Recurring instructions sent on every request; they add to input or cached-input cost each call."
+    },
+    "contextHistoryTokens": {
+      "label": "What are context and history tokens?",
+      "body": "Carried conversation or retrieved context that raises the cost of each request."
+    },
+    "outputTokens": {
+      "label": "What are output tokens?",
+      "body": "Tokens the model generates in its reply, billed at the output rate."
+    },
+    "tokenEstimate": {
+      "label": "How are tokens estimated?",
+      "body": "Rough guidance only, not exact billing. Roughly one token per four characters in English-like text."
+    },
+    "interactionsPerDay": {
+      "label": "What are interactions per day?",
+      "body": "Requests modeled per day; they scale per-interaction cost into daily, monthly, and yearly totals."
+    },
+    "cacheUnavailable": {
+      "label": "Why is there no cache pricing?",
+      "body": "This provider does not publish cache-specific pricing, so cache tokens are treated as regular input here."
+    },
+    "pricingSnapshot": {
+      "label": "What is a pricing snapshot?",
+      "body": "A versioned capture of provider and model prices. Every cost on screen is computed from the active snapshot, not from live pricing pages."
+    }
+  },
   "themeSelector": {
     "ariaLabel": "Change appearance",
     "label": "Appearance",

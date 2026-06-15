@@ -1,4 +1,51 @@
 {
+  "help": {
+    "promptCaching": {
+      "label": "¿Qué es el prompt caching?",
+      "body": "Algunos proveedores reutilizan prefijos o contexto repetidos del prompt y los cobran de forma distinta cuando se vuelven a enviar.",
+      "sourceLabel": "Documentación de prompt caching de OpenAI"
+    },
+    "cacheHitRate": {
+      "label": "¿Qué es la tasa de aciertos de caché?",
+      "body": "El porcentaje de tokens elegibles de prompt o contexto que se espera facturar como lecturas de caché en lugar de entrada normal."
+    },
+    "cachedInput": {
+      "label": "¿Qué es la entrada en caché?",
+      "body": "Tokens que se espera que usen el precio de lectura de caché en lugar del precio de entrada estándar."
+    },
+    "cacheWrite": {
+      "label": "¿Qué es la escritura de caché?",
+      "body": "Costo específico del proveedor, si lo hay, para establecer el contenido cacheable la primera vez."
+    },
+    "systemPromptTokens": {
+      "label": "¿Qué son los tokens del system prompt?",
+      "body": "Instrucciones recurrentes enviadas en cada solicitud; se suman al costo de entrada o de entrada en caché en cada llamada."
+    },
+    "contextHistoryTokens": {
+      "label": "¿Qué son los tokens de contexto e historial?",
+      "body": "Conversación arrastrada o contexto recuperado que aumenta el costo de cada solicitud."
+    },
+    "outputTokens": {
+      "label": "¿Qué son los tokens de salida?",
+      "body": "Tokens que el modelo genera en su respuesta, facturados a la tarifa de salida."
+    },
+    "tokenEstimate": {
+      "label": "¿Cómo se estiman los tokens?",
+      "body": "Solo una guía aproximada, no facturación exacta. Aproximadamente un token por cada cuatro caracteres en texto similar al inglés."
+    },
+    "interactionsPerDay": {
+      "label": "¿Qué son las interacciones por día?",
+      "body": "Solicitudes modeladas por día; escalan el costo por interacción hacia los totales diarios, mensuales y anuales."
+    },
+    "cacheUnavailable": {
+      "label": "¿Por qué no hay precio de caché?",
+      "body": "Este proveedor no publica precios específicos de caché, por lo que los tokens de caché se tratan como entrada normal aquí."
+    },
+    "pricingSnapshot": {
+      "label": "¿Qué es un snapshot de precios?",
+      "body": "Una captura versionada de los precios de proveedores y modelos. Cada costo en pantalla se calcula a partir del snapshot activo, no de páginas de precios en vivo."
+    }
+  },
   "themeSelector": {
     "ariaLabel": "Cambiar apariencia",
     "label": "Apariencia",
