@@ -170,6 +170,9 @@ const eslintConfig = defineConfig([
     'test-results/**',
     // Prisma Client is generated code.
     'lib/generated/**',
+    // Vendored shadcn/ui primitives and generated hooks.
+    'components/ui/**',
+    'hooks/use-mobile.ts',
   ]),
 ]);
 

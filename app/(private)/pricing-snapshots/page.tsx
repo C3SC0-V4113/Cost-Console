@@ -38,7 +38,7 @@ function PricingSnapshotsContent({ snapshots }: Readonly<{ snapshots: PricingSna
       </section>
 
       <section className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-        <div className="grid grid-cols-[1.6fr_repeat(4,minmax(0,1fr))] gap-4 border-b border-border px-6 py-4 text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+        <div className="hidden grid-cols-[1.6fr_repeat(4,minmax(0,1fr))] gap-4 border-b border-border px-6 py-4 text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase md:grid">
           <span>Name</span>
           <span>Status</span>
           <span>Currency</span>
@@ -55,16 +55,28 @@ function PricingSnapshotsContent({ snapshots }: Readonly<{ snapshots: PricingSna
               <Link
                 key={snapshot.id}
                 href={`/pricing-snapshots/${snapshot.id}`}
-                className="grid grid-cols-[1.6fr_repeat(4,minmax(0,1fr))] gap-4 px-6 py-4 text-sm transition-colors hover:bg-muted/40"
+                className="flex flex-col gap-2 px-6 py-4 text-sm transition-colors hover:bg-muted/40 md:grid md:grid-cols-[1.6fr_repeat(4,minmax(0,1fr))] md:items-center md:gap-4"
               >
                 <div className="grid gap-1">
                   <span className="font-medium text-foreground">{snapshot.name}</span>
                   <span className="text-muted-foreground">{snapshot.notes}</span>
                 </div>
-                <span className="text-foreground">{snapshot.status}</span>
-                <span className="text-foreground">{snapshot.currency}</span>
-                <span className="text-foreground">{snapshot.freshnessState}</span>
-                <span className="text-foreground">{formatDate(snapshot.capturedAt)}</span>
+                <span className="text-foreground">
+                  <span className="text-muted-foreground md:hidden">Status: </span>
+                  {snapshot.status}
+                </span>
+                <span className="text-foreground">
+                  <span className="text-muted-foreground md:hidden">Currency: </span>
+                  {snapshot.currency}
+                </span>
+                <span className="text-foreground">
+                  <span className="text-muted-foreground md:hidden">Freshness: </span>
+                  {snapshot.freshnessState}
+                </span>
+                <span className="text-foreground">
+                  <span className="text-muted-foreground md:hidden">Captured: </span>
+                  {formatDate(snapshot.capturedAt)}
+                </span>
               </Link>
             ))
           )}

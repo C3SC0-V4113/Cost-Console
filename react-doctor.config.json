@@ -1,6 +1,6 @@
 {
   "ignore": {
-    "files": [".agents/**", ".claude/**", "components/ui/**"],
+    "files": [".agents/**", ".claude/**", "components/ui/**", "hooks/use-mobile.ts"],
     "overrides": [
       {
         "files": ["lib/utils.ts", "lib/calc/chat-cost.ts"],
@@ -14,6 +14,7 @@
           "components/auth/login-form.tsx",
           "components/auth/register-form.tsx",
           "components/auth/user-menu.tsx",
+          "components/console/console-sidebar.tsx",
           "components/console/protected-shell.tsx",
           "components/i18n/language-selector.tsx",
           "components/theme/theme-mode-selector.tsx",

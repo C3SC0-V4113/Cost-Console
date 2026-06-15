@@ -1,12 +1,13 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { AccessDeniedPanel } from '@/components/auth/access-denied-panel';
 import { UserMenu } from '@/components/auth/user-menu';
+import { ConsoleSidebar } from '@/components/console/console-sidebar';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { getCurrentUser, getProjectAccess } from '@/lib/auth';
 import { getActiveSnapshot } from '@/lib/data/pricing-repository';
 import { formatDate } from '@/lib/format';
-import { cn } from '@/lib/utils';
 
 export async function ProtectedShell({
   children,
@@ -39,72 +40,47 @@ export async function ProtectedShell({
   const roleLabel = isAdmin ? 'admin' : 'user';
 
   return (
-    <div className="min-h-dvh bg-muted/30">
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
-              <p className="text-xs font-semibold tracking-[0.24em] text-muted-foreground uppercase">
-                Cost Console
-              </p>
-              <h1 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
-                Authenticated AI cost playground
-              </h1>
-            </div>
-            <nav className="flex flex-wrap items-center gap-2">
-              <Link
-                href="/"
-                className={cn(
-                  'inline-flex h-9 items-center rounded-md border border-border px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted'
-                )}
-              >
-                Playground
-              </Link>
-              {isAdmin ? (
-                <Link
-                  href="/pricing-snapshots"
-                  className={cn(
-                    'inline-flex h-9 items-center rounded-md border border-border px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted'
-                  )}
-                >
-                  Pricing snapshots
-                </Link>
-              ) : null}
-            </nav>
-          </div>
+    <TooltipProvider>
+      <SidebarProvider>
+        <ConsoleSidebar isAdmin={isAdmin} />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-4">
+            <SidebarTrigger />
+            <h1 className="min-w-0 flex-1 truncate font-heading text-base font-semibold tracking-tight text-foreground">
+              Authenticated AI cost playground
+            </h1>
 
-          <div className="flex flex-col items-start gap-4 lg:items-end">
-            <div className="grid gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm shadow-sm">
+            <div className="flex shrink-0 items-center gap-3">
               {snapshot ? (
-                <>
-                  <p className="font-medium text-card-foreground">
+                <div className="hidden flex-col text-right text-xs leading-tight lg:flex">
+                  <span className="font-medium text-foreground">
                     Active snapshot: {snapshot.name}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
-                    <span>{snapshot.currency}</span>
-                    <span>{snapshot.freshnessState}</span>
-                    <span>Captured {formatDate(snapshot.capturedAt)}</span>
-                  </div>
-                </>
+                  </span>
+                  <span className="text-muted-foreground">
+                    {snapshot.currency} · {snapshot.freshnessState} · Captured{' '}
+                    {formatDate(snapshot.capturedAt)}
+                  </span>
+                </div>
               ) : (
-                <p className="text-muted-foreground">No active pricing snapshot</p>
+                <span className="hidden text-xs text-muted-foreground lg:inline">
+                  No active pricing snapshot
+                </span>
               )}
-            </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex flex-col text-sm">
+              <div className="hidden flex-col text-right text-xs leading-tight md:flex">
                 <span className="font-medium text-foreground">{user.user.email}</span>
                 <span className="text-muted-foreground">Role: {roleLabel}</span>
               </div>
+
               <UserMenu email={user.user.email} displayName={user.user.displayName} />
             </div>
-          </div>
-        </div>
-      </header>
+          </header>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 py-8">
-        {requireAdmin && !isAdmin ? <AccessDeniedPanel /> : children}
-      </main>
-    </div>
+          <main className="flex flex-1 flex-col gap-6 p-6">
+            {requireAdmin && !isAdmin ? <AccessDeniedPanel /> : children}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }
