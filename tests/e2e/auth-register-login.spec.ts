@@ -25,7 +25,9 @@ test('registers a new account, signs out, and signs back in through Identity-Ser
   await expect(
     page.getByRole('heading', { name: /authenticated ai cost playground/i })
   ).toBeVisible();
-  await expect(page.getByText('Active snapshot: 2026-06 Curated Core Pricing')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /active pricing snapshot: 2026-06 Curated Core Pricing/i })
+  ).toBeVisible();
 
   // --- Sign out ---
   await page.getByRole('button', { name: /signed in as/i }).click();

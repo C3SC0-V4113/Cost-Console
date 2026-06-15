@@ -3,11 +3,11 @@ import { redirect } from 'next/navigation';
 import { AccessDeniedPanel } from '@/components/auth/access-denied-panel';
 import { UserMenu } from '@/components/auth/user-menu';
 import { ConsoleSidebar } from '@/components/console/console-sidebar';
+import { SnapshotInfo } from '@/components/console/snapshot-info';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getCurrentUser, getProjectAccess } from '@/lib/auth';
 import { getActiveSnapshot } from '@/lib/data/pricing-repository';
-import { formatDate } from '@/lib/format';
 
 export async function ProtectedShell({
   children,
@@ -51,21 +51,7 @@ export async function ProtectedShell({
             </h1>
 
             <div className="flex shrink-0 items-center gap-3">
-              {snapshot ? (
-                <div className="hidden flex-col text-right text-xs leading-tight lg:flex">
-                  <span className="font-medium text-foreground">
-                    Active snapshot: {snapshot.name}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {snapshot.currency} · {snapshot.freshnessState} · Captured{' '}
-                    {formatDate(snapshot.capturedAt)}
-                  </span>
-                </div>
-              ) : (
-                <span className="hidden text-xs text-muted-foreground lg:inline">
-                  No active pricing snapshot
-                </span>
-              )}
+              <SnapshotInfo snapshot={snapshot} />
 
               <div className="hidden flex-col text-right text-xs leading-tight md:flex">
                 <span className="font-medium text-foreground">{user.user.email}</span>

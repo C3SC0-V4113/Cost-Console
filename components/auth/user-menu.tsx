@@ -42,6 +42,7 @@ export function UserMenu({ email, displayName }: UserMenuProps) {
   const tLang = useTranslations('languageSelector');
   const { replace, refresh } = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSignOutConfirmOpen, setIsSignOutConfirmOpen] = useState(false);
 
   const handleSignOut = () => {
@@ -57,7 +58,7 @@ export function UserMenu({ email, displayName }: UserMenuProps) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             aria-label={t('signedInAs', { email: displayName ?? email })}
@@ -103,6 +104,7 @@ export function UserMenu({ email, displayName }: UserMenuProps) {
           <DropdownMenuItem
             onSelect={(event) => {
               event.preventDefault();
+              setIsMenuOpen(false);
               setIsSignOutConfirmOpen(true);
             }}
             className="text-destructive focus:bg-destructive/10 focus:text-destructive"

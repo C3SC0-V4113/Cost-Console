@@ -16,6 +16,7 @@
           "components/auth/user-menu.tsx",
           "components/console/console-sidebar.tsx",
           "components/console/protected-shell.tsx",
+          "components/console/snapshot-info.tsx",
           "components/i18n/language-selector.tsx",
           "components/theme/theme-mode-selector.tsx",
           "components/theme/theme-provider.tsx",
