@@ -31,7 +31,7 @@ export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null
 
   return (
     <div className="grid gap-4">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3">
         {ROLLUPS.map((rollup) => (
           <div key={rollup.key} className="grid gap-1 rounded-md bg-muted p-4">
             <span className="text-xs text-muted-foreground">{rollup.label}</span>
@@ -50,7 +50,7 @@ export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null
       )}
 
       <div className="overflow-hidden rounded-xl border border-border">
-        <div className="hidden grid-cols-[1.5fr_repeat(3,1fr)] gap-4 border-b border-border bg-muted/40 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase sm:grid">
+        <div className="hidden grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] gap-4 border-b border-border bg-muted/40 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase sm:grid">
           <span>Line item</span>
           <span className="text-right">Tokens</span>
           <span className="text-right">Unit price</span>
@@ -60,7 +60,7 @@ export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null
           {result.lineItems.map((item) => (
             <div
               key={item.category}
-              className="flex flex-col gap-1 px-4 py-3 text-sm sm:grid sm:grid-cols-[1.5fr_repeat(3,1fr)] sm:items-center sm:gap-4"
+              className="flex flex-col gap-1 px-4 py-3 text-sm sm:grid sm:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))] sm:items-center sm:gap-4"
             >
               <span className="font-medium text-foreground">{item.label}</span>
               <span className="text-muted-foreground sm:text-right">

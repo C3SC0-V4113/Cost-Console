@@ -53,7 +53,7 @@ function NumberField({
 }>) {
   return (
     <div className="grid gap-1.5">
-      <div className="flex items-center gap-1">
+      <div className="flex min-h-5 items-center gap-1">
         <Label htmlFor={id}>{label}</Label>
         {help}
       </div>
@@ -76,7 +76,7 @@ function Section({
 }: Readonly<{ title: string; help?: ReactNode; children: ReactNode }>) {
   return (
     <section className="grid gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex items-center gap-1">
+      <div className="flex min-h-5 items-center gap-1">
         <h3 className="text-sm font-semibold tracking-wide text-card-foreground uppercase">
           {title}
         </h3>
@@ -118,8 +118,10 @@ export function ChatCostCalculator({
     }, RECOMPUTE_DEBOUNCE_MS);
   }
 
+  const isCacheAvailable = result?.cacheAvailable ?? true;
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <div className="grid gap-5">
         <Section title="Model and pricing">
           <div className="grid gap-1.5">
@@ -236,25 +238,32 @@ export function ChatCostCalculator({
             </HelpTip>
           }
         >
-          <div className="grid gap-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1">
-                <Label htmlFor="cache-hit">Cache hit rate</Label>
-                <HelpTip label={t('cacheHitRate.label')}>{t('cacheHitRate.body')}</HelpTip>
+          {isCacheAvailable ? (
+            <div className="grid gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex min-h-5 items-center gap-1">
+                  <Label htmlFor="cache-hit">Cache hit rate</Label>
+                  <HelpTip label={t('cacheHitRate.label')}>{t('cacheHitRate.body')}</HelpTip>
+                </div>
+                <span className="text-sm font-medium text-foreground tabular-nums">
+                  {inputs.promptCacheHitPercentage}%
+                </span>
               </div>
-              <span className="text-sm font-medium text-foreground tabular-nums">
-                {inputs.promptCacheHitPercentage}%
-              </span>
+              <Slider
+                id="cache-hit"
+                value={[inputs.promptCacheHitPercentage]}
+                min={0}
+                max={100}
+                step={1}
+                onValueChange={(values) => update({ promptCacheHitPercentage: values[0] ?? 0 })}
+              />
             </div>
-            <Slider
-              id="cache-hit"
-              value={[inputs.promptCacheHitPercentage]}
-              min={0}
-              max={100}
-              step={1}
-              onValueChange={(values) => update({ promptCacheHitPercentage: values[0] ?? 0 })}
-            />
-          </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {result?.provider} does not publish prompt caching for this model, so the cache hit
+              rate has no effect on the estimate.
+            </p>
+          )}
         </Section>
       </div>
 

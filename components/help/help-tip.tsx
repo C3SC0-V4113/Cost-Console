@@ -34,9 +34,9 @@ export function HelpTip({
       size="icon-sm"
       type="button"
       aria-label={label}
-      className="text-muted-foreground"
+      className="size-5 text-muted-foreground"
     >
-      <CircleHelp />
+      <CircleHelp className="size-3.5" />
     </Button>
   );
 

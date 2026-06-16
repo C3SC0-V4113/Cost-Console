@@ -43,7 +43,7 @@ export async function ProtectedShell({
     <TooltipProvider>
       <SidebarProvider>
         <ConsoleSidebar isAdmin={isAdmin} />
-        <SidebarInset>
+        <SidebarInset className="min-w-0">
           <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-4">
             <SidebarTrigger />
             <h1 className="min-w-0 flex-1 truncate font-heading text-base font-semibold tracking-tight text-foreground">
@@ -62,7 +62,7 @@ export async function ProtectedShell({
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col gap-6 p-6">
+          <main className="flex min-w-0 flex-1 flex-col gap-6 p-6">
             {requireAdmin && !isAdmin ? <AccessDeniedPanel /> : children}
           </main>
         </SidebarInset>
