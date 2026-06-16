@@ -119,3 +119,11 @@ export async function listCatalog(snapshotId: string): Promise<PricingCatalogDTO
   });
   return rows.map(toCatalogDTO);
 }
+
+export async function getCatalogRowById(id: string): Promise<PricingCatalogDTO | null> {
+  const row = await prisma.pricingCatalog.findUnique({
+    where: { id },
+    include: { sourceReference: true },
+  });
+  return row ? toCatalogDTO(row) : null;
+}

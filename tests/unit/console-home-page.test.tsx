@@ -1,19 +1,14 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { redirect } from 'next/navigation';
+import { describe, expect, it, vi } from 'vitest';
 
 import HomePage from '@/app/(private)/page';
 
+vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
+
 describe('Console home page', () => {
-  it('renders the authenticated playground summary', async () => {
-    render(await HomePage());
+  it('redirects to the chat cost playground', () => {
+    HomePage();
 
-    expect(
-      screen.getByRole('heading', {
-        level: 2,
-        name: /cost console now opens behind project-scoped login/i,
-      })
-    ).toBeDefined();
-
-    expect(screen.getByText(/admin-only snapshots/i)).toBeDefined();
+    expect(redirect).toHaveBeenCalledWith('/chat');
   });
 });

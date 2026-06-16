@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Calculator,
-  Database,
-  LayoutDashboard,
-  MessageSquareText,
-  WalletCards,
-  Workflow,
-} from 'lucide-react';
+import { Calculator, Database, MessageSquareText, WalletCards, Workflow } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -24,14 +17,15 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 
-// Playground routes do not exist yet (they land in later phases). They are shown
-// as disabled placeholders so the navigation conveys the product shape without
-// linking to 404s. Chat Cost becomes a live link when its view ships.
-const playgrounds = [
-  { title: 'Chat Cost', icon: MessageSquareText },
+import type { LucideIcon } from 'lucide-react';
+
+// Playgrounds with an href are live; the rest are disabled placeholders that
+// convey the product shape without linking to routes that do not exist yet.
+const playgrounds: ReadonlyArray<{ title: string; icon: LucideIcon; href?: string }> = [
+  { title: 'Chat Cost', icon: MessageSquareText, href: '/chat' },
   { title: 'RAG Cost Lab', icon: Workflow },
   { title: 'Text-to-SQL Cost Lab', icon: Database },
-] as const;
+];
 
 export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
   const pathname = usePathname();
@@ -42,7 +36,7 @@ export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg" tooltip="Cost Console">
-              <Link href="/">
+              <Link href="/chat">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
                   <Calculator className="size-4" />
                 </div>
@@ -58,27 +52,29 @@ export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Overview</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === '/'} tooltip="Overview">
-                  <Link href="/">
-                    <LayoutDashboard />
-                    <span>Overview</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
           <SidebarGroupLabel>Playgrounds</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {playgrounds.map((item) => {
                 const Icon = item.icon;
+
+                if (item.href) {
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.href}
+                        tooltip={item.title}
+                      >
+                        <Link href={item.href}>
+                          <Icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton disabled tooltip={`${item.title} — coming soon`}>

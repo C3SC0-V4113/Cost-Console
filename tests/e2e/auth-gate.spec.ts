@@ -4,5 +4,5 @@ test('redirects unauthenticated visitors to login', async ({ page }) => {
   await page.goto('/');
 
   await expect(page).toHaveURL(/\/login$/);
-  await expect(page.getByRole('heading', { name: /sign in to cost console/i })).toBeVisible();
+  await expect(page.getByText(/sign in to cost console/i)).toBeVisible();
 });

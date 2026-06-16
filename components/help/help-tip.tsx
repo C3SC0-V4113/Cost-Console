@@ -18,8 +18,17 @@ type HelpTipProps = {
   sourceLabel?: string;
 };
 
-function HelpButton({ label }: Readonly<{ label: string }>) {
-  return (
+export function HelpTip({
+  label,
+  level = 'tip',
+  children,
+  sourceHref,
+  sourceLabel,
+}: Readonly<HelpTipProps>) {
+  // The trigger is the bare shadcn Button so the Tooltip/Popover trigger can
+  // forward its handlers and ref through `asChild` (an intermediate wrapper
+  // component would swallow them and the overlay would never open).
+  const trigger = (
     <Button
       variant="ghost"
       size="icon-sm"
@@ -30,21 +39,11 @@ function HelpButton({ label }: Readonly<{ label: string }>) {
       <CircleHelp />
     </Button>
   );
-}
 
-export function HelpTip({
-  label,
-  level = 'tip',
-  children,
-  sourceHref,
-  sourceLabel,
-}: Readonly<HelpTipProps>) {
   if (level === 'tip') {
     return (
       <Tooltip>
-        <TooltipTrigger asChild>
-          <HelpButton label={label} />
-        </TooltipTrigger>
+        <TooltipTrigger asChild>{trigger}</TooltipTrigger>
         <TooltipContent className="max-w-60 text-pretty">{children}</TooltipContent>
       </Tooltip>
     );
@@ -52,9 +51,7 @@ export function HelpTip({
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <HelpButton label={label} />
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{trigger}</PopoverTrigger>
       <PopoverContent align="start" className="w-72">
         <div className="grid gap-2 text-sm">
           <p className="leading-relaxed text-pretty text-foreground">{children}</p>
