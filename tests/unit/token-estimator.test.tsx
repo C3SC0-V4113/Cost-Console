@@ -1,8 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { NextIntlClientProvider } from 'next-intl';
 import { describe, expect, it } from 'vitest';
 
 import { TokenEstimator } from '@/components/help/token-estimator';
 import { countWords, estimateTokens } from '@/components/help/token-utils';
+import messages from '@/messages/en.json';
 
 describe('estimateTokens', () => {
   it('returns zero for empty text', () => {
@@ -28,7 +30,11 @@ describe('countWords', () => {
 
 describe('TokenEstimator', () => {
   it('updates the readout as text changes', () => {
-    render(<TokenEstimator />);
+    render(
+      <NextIntlClientProvider locale="en" messages={messages}>
+        <TokenEstimator />
+      </NextIntlClientProvider>
+    );
 
     fireEvent.change(screen.getByLabelText('Text'), { target: { value: 'a'.repeat(20) } });
 

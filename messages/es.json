@@ -123,5 +123,97 @@
       "project": "Proyecto",
       "role": "Rol"
     }
+  },
+  "shell": {
+    "brand": "Cost Console",
+    "tagline": "Playground de costos de IA",
+    "title": "Playground autenticado de costos de IA",
+    "role": "Rol: {role}",
+    "groupPlaygrounds": "Playgrounds",
+    "groupPricing": "Precios",
+    "chatCost": "Costo de chat",
+    "ragCostLab": "Lab de costos RAG",
+    "textToSqlCostLab": "Lab de costos Text-to-SQL",
+    "pricingSnapshots": "Snapshots de precios",
+    "comingSoon": "{name} — próximamente"
+  },
+  "snapshotInfo": {
+    "trigger": "Snapshot de precios activo: {name}",
+    "empty": "Sin snapshot de precios activo",
+    "heading": "Snapshot de precios activo",
+    "currency": "Moneda",
+    "freshness": "Frescura",
+    "captured": "Capturado"
+  },
+  "privateError": {
+    "title": "No se pudo cargar esta vista",
+    "body": "La base de datos de precios puede no estar disponible o aún no está configurada. Confirma que la base de datos esté corriendo e inténtalo de nuevo.",
+    "retry": "Reintentar"
+  },
+  "tokenLab": {
+    "trigger": "Token Lab",
+    "title": "Token Lab",
+    "description": "Estima cuántos tokens tiene un texto. El resultado es aproximado, no una facturación exacta.",
+    "approximate": "Aproximado, no es facturación",
+    "textLabel": "Texto",
+    "placeholder": "Pega o escribe cualquier texto para estimar sus tokens.",
+    "tokens": "~ tokens",
+    "characters": "caracteres",
+    "words": "palabras",
+    "note": "≈ 1 token por cada ~4 caracteres en texto similar al inglés. Una página A4 ronda los 400–900 tokens según el idioma, la densidad y el formato."
+  },
+  "chat": {
+    "eyebrow": "Playground de costo de chat",
+    "title": "Costo de tokens de chat por modelo",
+    "description": "Estima el costo por solicitud y por sesión a partir de los buckets de tokens, el volumen de interacciones y el prompt caching. Los cálculos corren en el backend contra el snapshot de precios activo.",
+    "noPricing": "No hay precios de chat disponibles en el snapshot activo.",
+    "sectionModel": "Modelo y precios",
+    "sectionVolume": "Volumen de interacciones",
+    "sectionTokens": "Tokens de entrada",
+    "sectionCaching": "Prompt caching",
+    "modelLabel": "Modelo",
+    "modelPlaceholder": "Selecciona un modelo",
+    "interactionsPerDay": "Interacciones / día",
+    "daysPerMonth": "Días / mes",
+    "systemPromptTokens": "Tokens del system prompt",
+    "userInputTokens": "Tokens de entrada del usuario",
+    "historyContextTokens": "Tokens de historial / contexto",
+    "cachedInputTokens": "Tokens de entrada en caché",
+    "outputTokens": "Tokens de salida",
+    "cacheHitRate": "Tasa de aciertos de caché",
+    "cacheUnavailable": "{provider} no publica prompt caching para este modelo, así que la tasa de aciertos de caché no afecta la estimación.",
+    "costSummary": "Resumen de costos",
+    "calculating": "Calculando…"
+  },
+  "costSummary": {
+    "selectModel": "Selecciona un modelo para ver la estimación de costo.",
+    "perInteraction": "Por interacción",
+    "perDay": "Por día",
+    "perMonth": "Por mes",
+    "perYear": "Por año",
+    "lineItem": "Concepto",
+    "tokens": "Tokens",
+    "unitPrice": "Precio unitario",
+    "costPerInteraction": "Costo / interacción",
+    "cacheUnavailableNote": "{provider} no publica precio de caché para {model}; los tokens de caché se facturan como entrada normal.",
+    "provider": "Proveedor",
+    "model": "Modelo",
+    "currency": "Moneda",
+    "interactionsPerDay": "Interacciones / día",
+    "daysPerMonth": "Días / mes",
+    "cacheHitPercentage": "Aciertos de caché %",
+    "tokensMobile": "Tokens: ",
+    "unitMobile": "Unitario: ",
+    "costMobile": "Costo: ",
+    "lineItems": {
+      "input": "Entrada sin caché",
+      "cached_input": "Entrada en caché (lectura)",
+      "cache_write": "Escritura de caché",
+      "output": "Salida"
+    }
+  },
+  "savedScenarios": {
+    "title": "Escenarios guardados",
+    "body": "Guardar escenarios aún no está disponible. La persistencia de escenarios se reserva hasta que se definan las reglas de propiedad y privacidad."
   }
 }

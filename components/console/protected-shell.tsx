@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 import { AccessDeniedPanel } from '@/components/auth/access-denied-panel';
 import { UserMenu } from '@/components/auth/user-menu';
@@ -38,6 +39,7 @@ export async function ProtectedShell({
 
   const isAdmin = access.access.isAdmin;
   const roleLabel = isAdmin ? 'admin' : 'user';
+  const t = await getTranslations('shell');
 
   return (
     <TooltipProvider>
@@ -47,7 +49,7 @@ export async function ProtectedShell({
           <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border px-4">
             <SidebarTrigger />
             <h1 className="min-w-0 flex-1 truncate font-heading text-base font-semibold tracking-tight text-foreground">
-              Authenticated AI cost playground
+              {t('title')}
             </h1>
 
             <div className="flex shrink-0 items-center gap-3">
@@ -55,7 +57,7 @@ export async function ProtectedShell({
 
               <div className="hidden flex-col text-right text-xs leading-tight md:flex">
                 <span className="font-medium text-foreground">{user.user.email}</span>
-                <span className="text-muted-foreground">Role: {roleLabel}</span>
+                <span className="text-muted-foreground">{t('role', { role: roleLabel })}</span>
               </div>
 
               <UserMenu email={user.user.email} displayName={user.user.displayName} />

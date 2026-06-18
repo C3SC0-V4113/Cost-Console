@@ -1,6 +1,7 @@
 'use client';
 
 import { WalletCards } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,15 +15,11 @@ import type { PricingSnapshotDTO } from '@/lib/data/dto';
 // every screen opens a popover with the snapshot details (ADR 0007: normal users
 // may see the active snapshot metadata).
 export function SnapshotInfo({ snapshot }: Readonly<{ snapshot: PricingSnapshotDTO | null }>) {
+  const t = useTranslations('snapshotInfo');
+
   if (!snapshot) {
     return (
-      <Button
-        variant="outline"
-        size="icon-sm"
-        type="button"
-        disabled
-        aria-label="No active pricing snapshot"
-      >
+      <Button variant="outline" size="icon-sm" type="button" disabled aria-label={t('empty')}>
         <WalletCards />
       </Button>
     );
@@ -35,7 +32,7 @@ export function SnapshotInfo({ snapshot }: Readonly<{ snapshot: PricingSnapshotD
           variant="outline"
           size="icon-sm"
           type="button"
-          aria-label={`Active pricing snapshot: ${snapshot.name}`}
+          aria-label={t('trigger', { name: snapshot.name })}
         >
           <WalletCards />
         </Button>
@@ -44,23 +41,23 @@ export function SnapshotInfo({ snapshot }: Readonly<{ snapshot: PricingSnapshotD
         <div className="grid gap-3">
           <div className="grid gap-1">
             <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              Active pricing snapshot
+              {t('heading')}
             </span>
             <span className="text-sm font-medium text-foreground">{snapshot.name}</span>
           </div>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             <div className="grid gap-0.5">
-              <dt className="text-xs text-muted-foreground">Currency</dt>
+              <dt className="text-xs text-muted-foreground">{t('currency')}</dt>
               <dd className="font-medium text-foreground">{snapshot.currency}</dd>
             </div>
             <div className="grid gap-0.5">
-              <dt className="text-xs text-muted-foreground">Freshness</dt>
+              <dt className="text-xs text-muted-foreground">{t('freshness')}</dt>
               <dd>
                 <Badge variant="secondary">{snapshot.freshnessState}</Badge>
               </dd>
             </div>
             <div className="col-span-2 grid gap-0.5">
-              <dt className="text-xs text-muted-foreground">Captured</dt>
+              <dt className="text-xs text-muted-foreground">{t('captured')}</dt>
               <dd className="font-medium text-foreground">{formatDate(snapshot.capturedAt)}</dd>
             </div>
           </dl>

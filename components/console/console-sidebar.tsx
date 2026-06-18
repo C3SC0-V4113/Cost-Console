@@ -3,6 +3,7 @@
 import { Calculator, Database, MessageSquareText, WalletCards, Workflow } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import {
   Sidebar,
@@ -21,13 +22,14 @@ import type { LucideIcon } from 'lucide-react';
 
 // Playgrounds with an href are live; the rest are disabled placeholders that
 // convey the product shape without linking to routes that do not exist yet.
-const playgrounds: ReadonlyArray<{ title: string; icon: LucideIcon; href?: string }> = [
-  { title: 'Chat Cost', icon: MessageSquareText, href: '/chat' },
-  { title: 'RAG Cost Lab', icon: Workflow },
-  { title: 'Text-to-SQL Cost Lab', icon: Database },
+const playgrounds: ReadonlyArray<{ key: string; icon: LucideIcon; href?: string }> = [
+  { key: 'chatCost', icon: MessageSquareText, href: '/chat' },
+  { key: 'ragCostLab', icon: Workflow },
+  { key: 'textToSqlCostLab', icon: Database },
 ];
 
 export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
+  const t = useTranslations('shell');
   const pathname = usePathname();
 
   return (
@@ -35,14 +37,14 @@ export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild size="lg" tooltip="Cost Console">
+            <SidebarMenuButton asChild size="lg" tooltip={t('brand')}>
               <Link href="/chat">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
                   <Calculator className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left leading-tight">
-                  <span className="truncate font-semibold">Cost Console</span>
-                  <span className="truncate text-xs text-muted-foreground">AI cost playground</span>
+                  <span className="truncate font-semibold">{t('brand')}</span>
+                  <span className="truncate text-xs text-muted-foreground">{t('tagline')}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -52,23 +54,20 @@ export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Playgrounds</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('groupPlaygrounds')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {playgrounds.map((item) => {
                 const Icon = item.icon;
+                const label = t(item.key);
 
                 if (item.href) {
                   return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        isActive={pathname === item.href}
-                        tooltip={item.title}
-                      >
+                    <SidebarMenuItem key={item.key}>
+                      <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={label}>
                         <Link href={item.href}>
                           <Icon />
-                          <span>{item.title}</span>
+                          <span>{label}</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -76,10 +75,10 @@ export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
                 }
 
                 return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton disabled tooltip={`${item.title} — coming soon`}>
+                  <SidebarMenuItem key={item.key}>
+                    <SidebarMenuButton disabled tooltip={t('comingSoon', { name: label })}>
                       <Icon />
-                      <span>{item.title}</span>
+                      <span>{label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -90,18 +89,18 @@ export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {
 
         {isAdmin ? (
           <SidebarGroup>
-            <SidebarGroupLabel>Pricing</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('groupPricing')}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
                     isActive={pathname.startsWith('/pricing-snapshots')}
-                    tooltip="Pricing snapshots"
+                    tooltip={t('pricingSnapshots')}
                   >
                     <Link href="/pricing-snapshots">
                       <WalletCards />
-                      <span>Pricing snapshots</span>
+                      <span>{t('pricingSnapshots')}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -92,6 +92,8 @@ export function ChatCostCalculator({
   defaultResult,
 }: Readonly<{ models: ChatModelOption[]; defaultResult: ChatCostResult | null }>) {
   const t = useTranslations('help');
+  const tc = useTranslations('chat');
+  const tTokens = useTranslations('tokenLab');
   const [inputs, setInputs] = useState<ChatCalculatorInputs>(() => ({
     model: models[0]?.id ?? '',
     ...DEFAULT_CHAT_INPUTS,
@@ -123,12 +125,12 @@ export function ChatCostCalculator({
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <div className="grid gap-5">
-        <Section title="Model and pricing">
+        <Section title={tc('sectionModel')}>
           <div className="grid gap-1.5">
-            <Label htmlFor="chat-model">Model</Label>
+            <Label htmlFor="chat-model">{tc('modelLabel')}</Label>
             <Select value={inputs.model} onValueChange={(value) => update({ model: value })}>
               <SelectTrigger id="chat-model">
-                <SelectValue placeholder="Select a model" />
+                <SelectValue placeholder={tc('modelPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
@@ -143,11 +145,11 @@ export function ChatCostCalculator({
           </div>
         </Section>
 
-        <Section title="Interaction volume">
+        <Section title={tc('sectionVolume')}>
           <div className="grid gap-4 sm:grid-cols-2">
             <NumberField
               id="interactions-per-day"
-              label="Interactions / day"
+              label={tc('interactionsPerDay')}
               value={inputs.interactionsPerDay}
               onChange={(value) => update({ interactionsPerDay: value })}
               help={
@@ -158,18 +160,18 @@ export function ChatCostCalculator({
             />
             <NumberField
               id="days-per-month"
-              label="Days / month"
+              label={tc('daysPerMonth')}
               value={inputs.daysPerMonth}
               onChange={(value) => update({ daysPerMonth: Math.min(MAX_DAYS_PER_MONTH, value) })}
             />
           </div>
         </Section>
 
-        <Section title="Token inputs">
+        <Section title={tc('sectionTokens')}>
           <div className="grid gap-4 sm:grid-cols-2">
             <NumberField
               id="system-prompt-tokens"
-              label="System prompt tokens"
+              label={tc('systemPromptTokens')}
               value={inputs.systemPromptTokens}
               onChange={(value) => update({ systemPromptTokens: value })}
               help={
@@ -180,13 +182,13 @@ export function ChatCostCalculator({
             />
             <NumberField
               id="user-input-tokens"
-              label="User input tokens"
+              label={tc('userInputTokens')}
               value={inputs.userInputTokens}
               onChange={(value) => update({ userInputTokens: value })}
             />
             <NumberField
               id="history-context-tokens"
-              label="History / context tokens"
+              label={tc('historyContextTokens')}
               value={inputs.historyContextTokens}
               onChange={(value) => update({ historyContextTokens: value })}
               help={
@@ -197,14 +199,14 @@ export function ChatCostCalculator({
             />
             <NumberField
               id="cached-input-tokens"
-              label="Cached input tokens"
+              label={tc('cachedInputTokens')}
               value={inputs.cachedInputTokens}
               onChange={(value) => update({ cachedInputTokens: value })}
               help={<HelpTip label={t('cachedInput.label')}>{t('cachedInput.body')}</HelpTip>}
             />
             <NumberField
               id="output-tokens"
-              label="Output tokens"
+              label={tc('outputTokens')}
               value={inputs.outputTokens}
               onChange={(value) => update({ outputTokens: value })}
               help={<HelpTip label={t('outputTokens.label')}>{t('outputTokens.body')}</HelpTip>}
@@ -215,7 +217,7 @@ export function ChatCostCalculator({
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" type="button">
                 <Braces data-icon="inline-start" />
-                Token Lab
+                {tTokens('trigger')}
                 <ChevronDown data-icon="inline-end" />
               </Button>
             </CollapsibleTrigger>
@@ -226,7 +228,7 @@ export function ChatCostCalculator({
         </Section>
 
         <Section
-          title="Prompt caching"
+          title={tc('sectionCaching')}
           help={
             <HelpTip
               level="info"
@@ -242,7 +244,7 @@ export function ChatCostCalculator({
             <div className="grid gap-3">
               <div className="flex items-center justify-between">
                 <div className="flex min-h-5 items-center gap-1">
-                  <Label htmlFor="cache-hit">Cache hit rate</Label>
+                  <Label htmlFor="cache-hit">{tc('cacheHitRate')}</Label>
                   <HelpTip label={t('cacheHitRate.label')}>{t('cacheHitRate.body')}</HelpTip>
                 </div>
                 <span className="text-sm font-medium text-foreground tabular-nums">
@@ -260,8 +262,7 @@ export function ChatCostCalculator({
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              {result?.provider} does not publish prompt caching for this model, so the cache hit
-              rate has no effect on the estimate.
+              {tc('cacheUnavailable', { provider: result?.provider ?? '' })}
             </p>
           )}
         </Section>
@@ -269,9 +270,11 @@ export function ChatCostCalculator({
 
       <div className="grid content-start gap-3">
         <div className="flex items-center gap-2">
-          <h2 className="font-heading text-lg font-semibold text-foreground">Cost summary</h2>
+          <h2 className="font-heading text-lg font-semibold text-foreground">
+            {tc('costSummary')}
+          </h2>
           {isCalculating ? (
-            <span className="text-xs text-muted-foreground">Calculating…</span>
+            <span className="text-xs text-muted-foreground">{tc('calculating')}</span>
           ) : null}
         </div>
         <CostSummary result={result} />

@@ -123,5 +123,97 @@
       "project": "Project",
       "role": "Role"
     }
+  },
+  "shell": {
+    "brand": "Cost Console",
+    "tagline": "AI cost playground",
+    "title": "Authenticated AI cost playground",
+    "role": "Role: {role}",
+    "groupPlaygrounds": "Playgrounds",
+    "groupPricing": "Pricing",
+    "chatCost": "Chat Cost",
+    "ragCostLab": "RAG Cost Lab",
+    "textToSqlCostLab": "Text-to-SQL Cost Lab",
+    "pricingSnapshots": "Pricing snapshots",
+    "comingSoon": "{name} — coming soon"
+  },
+  "snapshotInfo": {
+    "trigger": "Active pricing snapshot: {name}",
+    "empty": "No active pricing snapshot",
+    "heading": "Active pricing snapshot",
+    "currency": "Currency",
+    "freshness": "Freshness",
+    "captured": "Captured"
+  },
+  "privateError": {
+    "title": "This view could not load",
+    "body": "The pricing database may be unavailable or not yet configured. Confirm the database is running and try again.",
+    "retry": "Try again"
+  },
+  "tokenLab": {
+    "trigger": "Token Lab",
+    "title": "Token Lab",
+    "description": "Estimate how many tokens a piece of text is. The result is approximate, not exact billing math.",
+    "approximate": "Approximate, not billing math",
+    "textLabel": "Text",
+    "placeholder": "Paste or type any text to estimate its tokens.",
+    "tokens": "~ tokens",
+    "characters": "characters",
+    "words": "words",
+    "note": "≈ 1 token per ~4 characters in English-like text. One A4 page is roughly 400–900 tokens depending on language, density, and formatting."
+  },
+  "chat": {
+    "eyebrow": "Chat cost playground",
+    "title": "Model chat token cost",
+    "description": "Estimate request and session cost from token buckets, interaction volume, and prompt caching. Calculations run on the backend against the active pricing snapshot.",
+    "noPricing": "No chat pricing is available in the active snapshot.",
+    "sectionModel": "Model and pricing",
+    "sectionVolume": "Interaction volume",
+    "sectionTokens": "Token inputs",
+    "sectionCaching": "Prompt caching",
+    "modelLabel": "Model",
+    "modelPlaceholder": "Select a model",
+    "interactionsPerDay": "Interactions / day",
+    "daysPerMonth": "Days / month",
+    "systemPromptTokens": "System prompt tokens",
+    "userInputTokens": "User input tokens",
+    "historyContextTokens": "History / context tokens",
+    "cachedInputTokens": "Cached input tokens",
+    "outputTokens": "Output tokens",
+    "cacheHitRate": "Cache hit rate",
+    "cacheUnavailable": "{provider} does not publish prompt caching for this model, so the cache hit rate has no effect on the estimate.",
+    "costSummary": "Cost summary",
+    "calculating": "Calculating…"
+  },
+  "costSummary": {
+    "selectModel": "Select a model to see the cost estimate.",
+    "perInteraction": "Per interaction",
+    "perDay": "Per day",
+    "perMonth": "Per month",
+    "perYear": "Per year",
+    "lineItem": "Line item",
+    "tokens": "Tokens",
+    "unitPrice": "Unit price",
+    "costPerInteraction": "Cost / interaction",
+    "cacheUnavailableNote": "{provider} does not publish cache pricing for {model}; cache tokens are billed as regular input.",
+    "provider": "Provider",
+    "model": "Model",
+    "currency": "Currency",
+    "interactionsPerDay": "Interactions / day",
+    "daysPerMonth": "Days / month",
+    "cacheHitPercentage": "Cache hit %",
+    "tokensMobile": "Tokens: ",
+    "unitMobile": "Unit: ",
+    "costMobile": "Cost: ",
+    "lineItems": {
+      "input": "Uncached input",
+      "cached_input": "Cached input (read)",
+      "cache_write": "Cache write",
+      "output": "Output"
+    }
+  },
+  "savedScenarios": {
+    "title": "Saved scenarios",
+    "body": "Saving scenarios is not available yet. Scenario persistence is reserved until ownership and privacy rules are defined."
   }
 }
