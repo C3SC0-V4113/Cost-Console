@@ -1,8 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-
-import { formatCurrency } from '@/lib/format';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import type { ChatCostResult } from '@/lib/calc/chat-cost';
 
@@ -24,6 +22,7 @@ function Assumption({ label, value }: Readonly<{ label: string; value: string }>
 
 export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null }>) {
   const t = useTranslations('costSummary');
+  const format = useFormatter();
 
   if (!result) {
     return (
@@ -34,6 +33,26 @@ export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null
   }
 
   const { currency } = result;
+  const formatCurrency = (value: string) => {
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) {
+      return '—';
+    }
+
+    const absolute = Math.abs(amount);
+    const maximumFractionDigits = absolute > 0 && absolute < 1 ? 6 : 2;
+
+    try {
+      return format.number(amount, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 2,
+        maximumFractionDigits,
+      });
+    } catch {
+      return `${amount.toFixed(2)} ${currency}`;
+    }
+  };
 
   return (
     <div className="grid gap-4">
@@ -42,7 +61,7 @@ export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null
           <div key={rollup.key} className="grid gap-1 rounded-md bg-muted p-4">
             <span className="text-xs text-muted-foreground">{t(rollup.labelKey)}</span>
             <span className="text-xl font-semibold text-foreground tabular-nums">
-              {formatCurrency(result[rollup.key], currency)}
+              {formatCurrency(result[rollup.key])}
             </span>
           </div>
         ))}
@@ -74,13 +93,13 @@ export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null
               </span>
               <span className="text-muted-foreground sm:text-right">
                 <span className="sm:hidden">{t('unitMobile')}</span>
-                {formatCurrency(item.unitPrice, currency)}/1M
+                {formatCurrency(item.unitPrice)}/1M
               </span>
               <span className="font-medium text-foreground sm:text-right">
                 <span className="font-normal text-muted-foreground sm:hidden">
                   {t('costMobile')}
                 </span>
-                {formatCurrency(item.costPerInteraction, currency)}
+                {formatCurrency(item.costPerInteraction)}
               </span>
             </div>
           ))}

@@ -10,10 +10,11 @@ import type { ChatModelOption } from '@/components/chat/chat-cost-calculator';
 import type { ChatCostResult } from '@/lib/calc/chat-cost';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Chat Cost',
-  description: 'Estimate chat token cost with prompt caching, interaction volume, and rollups.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('chat');
+
+  return { title: t('metaTitle'), description: t('metaDescription') };
+}
 
 export default async function ChatCostPage() {
   const [t, snapshot] = await Promise.all([getTranslations('chat'), getActiveSnapshot()]);

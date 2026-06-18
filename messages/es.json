@@ -163,6 +163,8 @@
     "note": "≈ 1 token por cada ~4 caracteres en texto similar al inglés. Una página A4 ronda los 400–900 tokens según el idioma, la densidad y el formato."
   },
   "chat": {
+    "metaTitle": "Costo de chat",
+    "metaDescription": "Estima el costo de tokens de chat con prompt caching, volumen de interacciones y acumulados.",
     "eyebrow": "Playground de costo de chat",
     "title": "Costo de tokens de chat por modelo",
     "description": "Estima el costo por solicitud y por sesión a partir de los buckets de tokens, el volumen de interacciones y el prompt caching. Los cálculos corren en el backend contra el snapshot de precios activo.",

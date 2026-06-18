@@ -1,12 +1,11 @@
 'use client';
 
 import { WalletCards } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { formatDate } from '@/lib/format';
 
 import type { PricingSnapshotDTO } from '@/lib/data/dto';
 
@@ -16,6 +15,7 @@ import type { PricingSnapshotDTO } from '@/lib/data/dto';
 // may see the active snapshot metadata).
 export function SnapshotInfo({ snapshot }: Readonly<{ snapshot: PricingSnapshotDTO | null }>) {
   const t = useTranslations('snapshotInfo');
+  const format = useFormatter();
 
   if (!snapshot) {
     return (
@@ -58,7 +58,14 @@ export function SnapshotInfo({ snapshot }: Readonly<{ snapshot: PricingSnapshotD
             </div>
             <div className="col-span-2 grid gap-0.5">
               <dt className="text-xs text-muted-foreground">{t('captured')}</dt>
-              <dd className="font-medium text-foreground">{formatDate(snapshot.capturedAt)}</dd>
+              <dd className="font-medium text-foreground">
+                {format.dateTime(new Date(snapshot.capturedAt), {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  timeZone: 'UTC',
+                })}
+              </dd>
             </div>
           </dl>
         </div>
