@@ -44,6 +44,26 @@
     "pricingSnapshot": {
       "label": "What is a pricing snapshot?",
       "body": "A versioned capture of provider and model prices. Every cost on screen is computed from the active snapshot, not from live pricing pages."
+    },
+    "ingestion": {
+      "label": "What is ingestion?",
+      "body": "The one-time cost of embedding your document corpus into a vector store. It is separate from the recurring per-query cost."
+    },
+    "cleanupRetention": {
+      "label": "What is cleanup retention?",
+      "body": "The percentage of corpus tokens kept after removing boilerplate, duplicates, and noise before chunking and embedding."
+    },
+    "chunking": {
+      "label": "How do chunk size and overlap affect cost?",
+      "body": "Documents are split into chunks of this size. Overlap re-embeds shared tokens between chunks, so more overlap means more embedding tokens and higher ingestion cost."
+    },
+    "topK": {
+      "label": "What is top-k?",
+      "body": "How many chunks are retrieved per query. Each retrieved chunk is added to the LLM context, so a higher top-k raises generation input cost."
+    },
+    "retrievedContext": {
+      "label": "What are retrieved context tokens?",
+      "body": "The chunks returned by retrieval become part of the final LLM request. Their tokens are billed as generation input, not as query embedding."
     }
   },
   "themeSelector": {
@@ -309,6 +329,62 @@
       "active": "Active",
       "superseded": "Superseded",
       "archived": "Archived"
+    }
+  },
+  "rag": {
+    "metaTitle": "RAG Cost Lab",
+    "metaDescription": "Model end-to-end RAG cost: one-time embedding ingestion, per-query embedding, retrieved-context generation, and recurring totals.",
+    "eyebrow": "RAG cost playground",
+    "title": "End-to-end RAG cost",
+    "description": "Estimate one-time embedding ingestion and recurring per-query cost across the RAG pipeline: chunking, embedding, retrieval, and cache-aware generation. Calculations run on the backend against the active pricing snapshot.",
+    "noPricing": "The active snapshot has no embedding and chat models to model a RAG pipeline.",
+    "sectionModels": "Models",
+    "embeddingModelLabel": "Embedding model",
+    "embeddingModelPlaceholder": "Select an embedding model",
+    "generationModelLabel": "Generation model",
+    "generationModelPlaceholder": "Select a generation model",
+    "sectionIngestion": "Ingestion (one-time)",
+    "documentCount": "Document count",
+    "avgDocumentTokens": "Avg tokens per document",
+    "cleanupRetention": "Cleanup retention (%)",
+    "chunkSize": "Chunk size (tokens)",
+    "chunkOverlap": "Chunk overlap (tokens)",
+    "sectionQuery": "Query & retrieval",
+    "queriesPerDay": "Queries per day",
+    "daysPerMonth": "Days per month",
+    "avgQueryTokens": "Avg query tokens",
+    "topK": "Top-k retrieved chunks",
+    "avgRetrievedChunkTokens": "Avg tokens per retrieved chunk",
+    "sectionGeneration": "Generation",
+    "systemPromptTokens": "System prompt tokens",
+    "expectedOutputTokens": "Expected output tokens",
+    "cacheHitRate": "Cache hit rate",
+    "cacheUnavailable": "{provider} does not publish cache pricing, so context is billed as regular input.",
+    "costSummary": "Cost summary",
+    "calculating": "Calculating…",
+    "summary": {
+      "selectModel": "Select embedding and generation models to estimate RAG cost.",
+      "oneTimeIngestion": "One-time ingestion",
+      "ingestionDetail": "{chunks} chunks · {tokens} embedding tokens",
+      "perQuery": "Per query",
+      "perDay": "Per day",
+      "perMonth": "Per month",
+      "perYear": "Per year",
+      "lineItem": "Line item",
+      "tokens": "Tokens",
+      "costPerQuery": "Cost / query",
+      "queryEmbedding": "Query embedding",
+      "storage": "Vector storage",
+      "storageUnavailable": "Not available (no source-backed price)",
+      "perMonthSuffix": "/mo",
+      "monthlyTotal": "Monthly total",
+      "yearlyTotal": "Yearly total",
+      "embeddingModel": "Embedding",
+      "generationModel": "Generation",
+      "currency": "Currency",
+      "topK": "Top-k",
+      "queriesPerDay": "Queries / day",
+      "cacheHitPercentage": "Cache hit %"
     }
   }
 }

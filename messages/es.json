@@ -44,6 +44,26 @@
     "pricingSnapshot": {
       "label": "¿Qué es un snapshot de precios?",
       "body": "Una captura versionada de los precios de proveedores y modelos. Cada costo en pantalla se calcula a partir del snapshot activo, no de páginas de precios en vivo."
+    },
+    "ingestion": {
+      "label": "¿Qué es la ingestión?",
+      "body": "El costo único de generar embeddings de tu corpus de documentos hacia un vector store. Es independiente del costo recurrente por consulta."
+    },
+    "cleanupRetention": {
+      "label": "¿Qué es la retención de limpieza?",
+      "body": "El porcentaje de tokens del corpus que se conservan tras quitar texto repetido, duplicados y ruido, antes del chunking y el embedding."
+    },
+    "chunking": {
+      "label": "¿Cómo afectan al costo el tamaño y el solapamiento de chunk?",
+      "body": "Los documentos se dividen en chunks de este tamaño. El solapamiento vuelve a embeddear tokens compartidos entre chunks, así que más solapamiento significa más tokens de embedding y mayor costo de ingestión."
+    },
+    "topK": {
+      "label": "¿Qué es top-k?",
+      "body": "Cuántos chunks se recuperan por consulta. Cada chunk recuperado se agrega al contexto del LLM, así que un top-k mayor aumenta el costo de entrada de la generación."
+    },
+    "retrievedContext": {
+      "label": "¿Qué son los tokens de contexto recuperado?",
+      "body": "Los chunks que devuelve la recuperación pasan a formar parte de la solicitud final al LLM. Sus tokens se facturan como entrada de generación, no como embedding de la consulta."
     }
   },
   "themeSelector": {
@@ -309,6 +329,62 @@
       "active": "Activo",
       "superseded": "Reemplazado",
       "archived": "Archivado"
+    }
+  },
+  "rag": {
+    "metaTitle": "RAG Cost Lab",
+    "metaDescription": "Modela el costo de RAG de punta a punta: ingestión de embeddings única, embedding por consulta, generación con contexto recuperado y totales recurrentes.",
+    "eyebrow": "Playground de costo de RAG",
+    "title": "Costo de RAG de punta a punta",
+    "description": "Estima la ingestión única de embeddings y el costo recurrente por consulta a lo largo del pipeline de RAG: chunking, embedding, recuperación y generación con caching. Los cálculos corren en el backend contra el snapshot de precios activo.",
+    "noPricing": "El snapshot activo no tiene modelos de embedding y de chat para modelar un pipeline de RAG.",
+    "sectionModels": "Modelos",
+    "embeddingModelLabel": "Modelo de embedding",
+    "embeddingModelPlaceholder": "Elegí un modelo de embedding",
+    "generationModelLabel": "Modelo de generación",
+    "generationModelPlaceholder": "Elegí un modelo de generación",
+    "sectionIngestion": "Ingestión (única)",
+    "documentCount": "Cantidad de documentos",
+    "avgDocumentTokens": "Tokens promedio por documento",
+    "cleanupRetention": "Retención de limpieza (%)",
+    "chunkSize": "Tamaño de chunk (tokens)",
+    "chunkOverlap": "Solapamiento de chunk (tokens)",
+    "sectionQuery": "Consulta y recuperación",
+    "queriesPerDay": "Consultas por día",
+    "daysPerMonth": "Días por mes",
+    "avgQueryTokens": "Tokens promedio de consulta",
+    "topK": "Chunks recuperados (top-k)",
+    "avgRetrievedChunkTokens": "Tokens promedio por chunk recuperado",
+    "sectionGeneration": "Generación",
+    "systemPromptTokens": "Tokens del system prompt",
+    "expectedOutputTokens": "Tokens de salida esperados",
+    "cacheHitRate": "Tasa de aciertos de caché",
+    "cacheUnavailable": "{provider} no publica precios de caché, así que el contexto se factura como entrada regular.",
+    "costSummary": "Resumen de costo",
+    "calculating": "Calculando…",
+    "summary": {
+      "selectModel": "Elegí modelos de embedding y de generación para estimar el costo de RAG.",
+      "oneTimeIngestion": "Ingestión única",
+      "ingestionDetail": "{chunks} chunks · {tokens} tokens de embedding",
+      "perQuery": "Por consulta",
+      "perDay": "Por día",
+      "perMonth": "Por mes",
+      "perYear": "Por año",
+      "lineItem": "Concepto",
+      "tokens": "Tokens",
+      "costPerQuery": "Costo / consulta",
+      "queryEmbedding": "Embedding de consulta",
+      "storage": "Almacenamiento de vectores",
+      "storageUnavailable": "No disponible (sin precio citado)",
+      "perMonthSuffix": "/mes",
+      "monthlyTotal": "Total mensual",
+      "yearlyTotal": "Total anual",
+      "embeddingModel": "Embedding",
+      "generationModel": "Generación",
+      "currency": "Moneda",
+      "topK": "Top-k",
+      "queriesPerDay": "Consultas / día",
+      "cacheHitPercentage": "% aciertos de caché"
     }
   }
 }

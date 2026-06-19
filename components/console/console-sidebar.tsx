@@ -24,7 +24,7 @@ import type { LucideIcon } from 'lucide-react';
 // convey the product shape without linking to routes that do not exist yet.
 const playgrounds: ReadonlyArray<{ key: string; icon: LucideIcon; href?: string }> = [
   { key: 'chatCost', icon: MessageSquareText, href: '/chat' },
-  { key: 'ragCostLab', icon: Workflow },
+  { key: 'ragCostLab', icon: Workflow, href: '/rag' },
   { key: 'textToSqlCostLab', icon: Database },
 ];
 

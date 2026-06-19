@@ -5,11 +5,11 @@ import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
 import { calculateChatCost } from '@/app/(private)/chat/actions';
+import { NumberField, Section } from '@/components/calc/calculator-fields';
 import { HelpTip } from '@/components/help/help-tip';
 import { TokenEstimator } from '@/components/help/token-estimator';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -26,66 +26,11 @@ import { CostSummary } from './cost-summary';
 
 import type { ChatCalculatorInputs } from './chat-inputs';
 import type { ChatCostResult } from '@/lib/calc/chat-cost';
-import type { ReactNode } from 'react';
 
 export type ChatModelOption = { id: string; provider: string; model: string };
 
 const RECOMPUTE_DEBOUNCE_MS = 250;
 const MAX_DAYS_PER_MONTH = 31;
-
-function toNonNegativeInt(value: string): number {
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
-}
-
-function NumberField({
-  id,
-  label,
-  value,
-  help,
-  onChange,
-}: Readonly<{
-  id: string;
-  label: string;
-  value: number;
-  help?: ReactNode;
-  onChange: (value: number) => void;
-}>) {
-  return (
-    <div className="grid gap-1.5">
-      <div className="flex min-h-5 items-center gap-1">
-        <Label htmlFor={id}>{label}</Label>
-        {help}
-      </div>
-      <Input
-        id={id}
-        type="number"
-        inputMode="numeric"
-        min={0}
-        value={value}
-        onChange={(event) => onChange(toNonNegativeInt(event.target.value))}
-      />
-    </div>
-  );
-}
-
-function Section({
-  title,
-  help,
-  children,
-}: Readonly<{ title: string; help?: ReactNode; children: ReactNode }>) {
-  return (
-    <section className="grid gap-3 rounded-2xl border border-border bg-card p-5 shadow-sm">
-      <div className="flex min-h-5 items-center gap-1">
-        <h3 className="text-sm font-semibold tracking-wide text-card-foreground uppercase">
-          {title}
-        </h3>
-        {help}
-      </div>
-      {children}
-    </section>
-  );
-}
 
 export function ChatCostCalculator({
   models,
