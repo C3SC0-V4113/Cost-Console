@@ -3,45 +3,7 @@
     "files": [".agents/**", ".claude/**", "components/ui/**", "hooks/use-mobile.ts"],
     "overrides": [
       {
-        "files": ["lib/utils.ts", "lib/calc/chat-cost.ts"],
-        "rules": ["deslop/unused-file"]
-      },
-      {
-        "files": [
-          "components/auth/access-denied-panel.tsx",
-          "components/auth/auth-client.ts",
-          "components/auth/email-form.tsx",
-          "components/auth/login-form.tsx",
-          "components/auth/register-form.tsx",
-          "components/auth/user-menu.tsx",
-          "components/chat/chat-cost-calculator.tsx",
-          "components/chat/chat-inputs.ts",
-          "components/chat/cost-summary.tsx",
-          "components/chat/saved-scenarios.tsx",
-          "components/console/console-sidebar.tsx",
-          "components/console/protected-shell.tsx",
-          "components/console/snapshot-info.tsx",
-          "components/help/help-tip.tsx",
-          "components/help/source-tag.tsx",
-          "components/help/token-estimator.tsx",
-          "components/help/token-lab.tsx",
-          "components/help/token-utils.ts",
-          "components/pricing/pricing-catalog-table.tsx",
-          "components/i18n/language-selector.tsx",
-          "components/theme/theme-mode-selector.tsx",
-          "components/theme/theme-provider.tsx",
-          "hooks/use-currency-format.ts",
-          "i18n/actions.ts",
-          "i18n/config.ts",
-          "i18n/locale.ts",
-          "lib/auth-shared.ts",
-          "lib/auth.ts",
-          "lib/data/dto.ts",
-          "lib/data/pricing-repository.ts",
-          "lib/identity-client.ts",
-          "lib/prisma.ts",
-          "lib/roles.ts"
-        ],
+        "files": ["components/**", "hooks/**", "i18n/**", "lib/**"],
         "rules": ["deslop/unused-file"]
       }
     ]
