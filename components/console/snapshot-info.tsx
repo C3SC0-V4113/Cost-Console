@@ -15,6 +15,7 @@ import type { PricingSnapshotDTO } from '@/lib/data/dto';
 // may see the active snapshot metadata).
 export function SnapshotInfo({ snapshot }: Readonly<{ snapshot: PricingSnapshotDTO | null }>) {
   const t = useTranslations('snapshotInfo');
+  const tp = useTranslations('pricing');
   const format = useFormatter();
 
   if (!snapshot) {
@@ -53,7 +54,7 @@ export function SnapshotInfo({ snapshot }: Readonly<{ snapshot: PricingSnapshotD
             <div className="grid gap-0.5">
               <dt className="text-xs text-muted-foreground">{t('freshness')}</dt>
               <dd>
-                <Badge variant="secondary">{snapshot.freshnessState}</Badge>
+                <Badge variant="secondary">{tp(`freshness.${snapshot.freshnessState}`)}</Badge>
               </dd>
             </div>
             <div className="col-span-2 grid gap-0.5">

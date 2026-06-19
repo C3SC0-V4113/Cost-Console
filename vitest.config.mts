@@ -18,6 +18,9 @@ export default defineConfig({
     ],
   },
   test: {
+    // Expose afterEach globally so @testing-library/react auto-registers DOM
+    // cleanup between tests (keeps the jsdom document isolated).
+    globals: true,
     environment: 'jsdom',
     env: {
       // lib/prisma requires DATABASE_URL at import time; the client is mocked in

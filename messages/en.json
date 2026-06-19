@@ -217,5 +217,98 @@
   "savedScenarios": {
     "title": "Saved scenarios",
     "body": "Saving scenarios is not available yet. Scenario persistence is reserved until ownership and privacy rules are defined."
+  },
+  "sourceTag": {
+    "noSource": "No source",
+    "ariaLabel": "Source: {title}",
+    "type": "Type",
+    "retrieved": "Retrieved",
+    "sourceDate": "Source date",
+    "types": {
+      "official_pricing": "Official pricing",
+      "official_docs": "Official docs",
+      "third_party_benchmark": "Third-party benchmark",
+      "vendor_benchmark": "Vendor benchmark",
+      "internal_manual": "Manual entry"
+    }
+  },
+  "pricing": {
+    "access": {
+      "eyebrow": "Restricted surface",
+      "title": "Admin access required",
+      "body": "Pricing snapshot management is reserved for project admins. Standard users can continue using the playground but cannot open snapshot administration routes.",
+      "back": "Back to playground"
+    },
+    "snapshots": {
+      "metaTitle": "Pricing snapshots",
+      "metaDescription": "Admin-only pricing snapshot surface for Cost Console.",
+      "eyebrow": "Admin surface",
+      "title": "Pricing snapshots",
+      "body": "This surface is restricted to project admins. It lists captured pricing snapshots and opens each one for catalog drill-down, behind admin-only navigation and API guards.",
+      "prepare": "Prepare snapshot",
+      "empty": "No pricing snapshots have been captured yet.",
+      "colName": "Name",
+      "colStatus": "Status",
+      "colCurrency": "Currency",
+      "colFreshness": "Freshness",
+      "colCaptured": "Captured"
+    },
+    "detail": {
+      "metaTitle": "Pricing snapshot detail",
+      "metaDescription": "Admin-only pricing snapshot detail surface.",
+      "eyebrow": "Snapshot detail",
+      "status": "Status",
+      "currency": "Currency",
+      "freshness": "Freshness",
+      "capturedAt": "Captured at",
+      "validFrom": "Valid from",
+      "coverage": "Catalog coverage",
+      "coverageValue": "{count, plural, =0 {No catalog rows} one {# row} other {# rows}}",
+      "noValue": "—"
+    },
+    "catalog": {
+      "heading": "Pricing catalog",
+      "description": "Per-model prices captured in this snapshot. Every row carries the cited source it was traced from.",
+      "systemPrompt": {
+        "label": "Where are system prompt tokens?",
+        "body": "System prompts are not a separate catalog line. They are billed as input tokens at the model's input price, or at the cached-input price when prompt caching applies."
+      },
+      "empty": "This snapshot has no catalog rows yet.",
+      "caption": "Prices are per 1M tokens · {currency}",
+      "colModel": "Provider · Model",
+      "colCapability": "Capability",
+      "colContext": "Context window",
+      "colInput": "Input",
+      "colCachedInput": "Cached input",
+      "colCacheWrite": "Cache write",
+      "colOutput": "Output",
+      "colEmbedding": "Embedding",
+      "colValidity": "Validity",
+      "colSource": "Source",
+      "perMillionSuffix": "/1M",
+      "noValue": "—"
+    },
+    "capability": {
+      "chat": "Chat",
+      "embedding": "Embedding",
+      "reranking": "Reranking",
+      "image": "Image"
+    },
+    "validity": {
+      "active": "Active",
+      "stale": "Stale",
+      "manual": "Manual"
+    },
+    "freshness": {
+      "fresh": "Fresh",
+      "stale": "Stale",
+      "review": "Review"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "superseded": "Superseded",
+      "archived": "Archived"
+    }
   }
 }

@@ -217,5 +217,98 @@
   "savedScenarios": {
     "title": "Escenarios guardados",
     "body": "Guardar escenarios aún no está disponible. La persistencia de escenarios se reserva hasta que se definan las reglas de propiedad y privacidad."
+  },
+  "sourceTag": {
+    "noSource": "Sin fuente",
+    "ariaLabel": "Fuente: {title}",
+    "type": "Tipo",
+    "retrieved": "Consultado",
+    "sourceDate": "Fecha de la fuente",
+    "types": {
+      "official_pricing": "Precios oficiales",
+      "official_docs": "Documentación oficial",
+      "third_party_benchmark": "Benchmark de terceros",
+      "vendor_benchmark": "Benchmark del proveedor",
+      "internal_manual": "Carga manual"
+    }
+  },
+  "pricing": {
+    "access": {
+      "eyebrow": "Superficie restringida",
+      "title": "Se requiere acceso de administrador",
+      "body": "La gestión de snapshots de precios está reservada a los administradores del proyecto. Los usuarios estándar pueden seguir usando el playground, pero no pueden abrir las rutas de administración de snapshots.",
+      "back": "Volver al playground"
+    },
+    "snapshots": {
+      "metaTitle": "Snapshots de precios",
+      "metaDescription": "Superficie de snapshots de precios solo para administradores de Cost Console.",
+      "eyebrow": "Superficie de administración",
+      "title": "Snapshots de precios",
+      "body": "Esta superficie está restringida a los administradores del proyecto. Lista los snapshots de precios capturados y abre cada uno para explorar su catálogo, detrás de navegación y guards de API solo para administradores.",
+      "prepare": "Preparar snapshot",
+      "empty": "Todavía no se capturó ningún snapshot de precios.",
+      "colName": "Nombre",
+      "colStatus": "Estado",
+      "colCurrency": "Moneda",
+      "colFreshness": "Vigencia",
+      "colCaptured": "Capturado"
+    },
+    "detail": {
+      "metaTitle": "Detalle del snapshot de precios",
+      "metaDescription": "Superficie de detalle de snapshot de precios solo para administradores.",
+      "eyebrow": "Detalle del snapshot",
+      "status": "Estado",
+      "currency": "Moneda",
+      "freshness": "Vigencia",
+      "capturedAt": "Capturado el",
+      "validFrom": "Válido desde",
+      "coverage": "Cobertura del catálogo",
+      "coverageValue": "{count, plural, =0 {Sin filas de catálogo} one {# fila} other {# filas}}",
+      "noValue": "—"
+    },
+    "catalog": {
+      "heading": "Catálogo de precios",
+      "description": "Precios por modelo capturados en este snapshot. Cada fila conserva la fuente citada de la que se trazó.",
+      "systemPrompt": {
+        "label": "¿Dónde están los tokens del system prompt?",
+        "body": "Los system prompts no son una línea aparte del catálogo. Se facturan como tokens de entrada al precio de entrada del modelo, o al precio de entrada cacheada cuando aplica el prompt caching."
+      },
+      "empty": "Este snapshot todavía no tiene filas de catálogo.",
+      "caption": "Los precios son por 1M de tokens · {currency}",
+      "colModel": "Proveedor · Modelo",
+      "colCapability": "Capacidad",
+      "colContext": "Ventana de contexto",
+      "colInput": "Entrada",
+      "colCachedInput": "Entrada cacheada",
+      "colCacheWrite": "Escritura de caché",
+      "colOutput": "Salida",
+      "colEmbedding": "Embedding",
+      "colValidity": "Vigencia",
+      "colSource": "Fuente",
+      "perMillionSuffix": "/1M",
+      "noValue": "—"
+    },
+    "capability": {
+      "chat": "Chat",
+      "embedding": "Embedding",
+      "reranking": "Reranking",
+      "image": "Imagen"
+    },
+    "validity": {
+      "active": "Vigente",
+      "stale": "Desactualizado",
+      "manual": "Manual"
+    },
+    "freshness": {
+      "fresh": "Vigente",
+      "stale": "Desactualizado",
+      "review": "En revisión"
+    },
+    "status": {
+      "draft": "Borrador",
+      "active": "Activo",
+      "superseded": "Reemplazado",
+      "archived": "Archivado"
+    }
   }
 }

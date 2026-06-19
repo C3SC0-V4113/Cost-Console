@@ -1,6 +1,8 @@
 'use client';
 
-import { useFormatter, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
+
+import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
 import type { ChatCostResult } from '@/lib/calc/chat-cost';
 
@@ -22,7 +24,7 @@ function Assumption({ label, value }: Readonly<{ label: string; value: string }>
 
 export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null }>) {
   const t = useTranslations('costSummary');
-  const format = useFormatter();
+  const formatCurrency = useCurrencyFormat(result?.currency ?? 'USD');
 
   if (!result) {
     return (
@@ -31,28 +33,6 @@ export function CostSummary({ result }: Readonly<{ result: ChatCostResult | null
       </div>
     );
   }
-
-  const { currency } = result;
-  const formatCurrency = (value: string) => {
-    const amount = Number(value);
-    if (!Number.isFinite(amount)) {
-      return '—';
-    }
-
-    const absolute = Math.abs(amount);
-    const maximumFractionDigits = absolute > 0 && absolute < 1 ? 6 : 2;
-
-    try {
-      return format.number(amount, {
-        style: 'currency',
-        currency,
-        minimumFractionDigits: 2,
-        maximumFractionDigits,
-      });
-    } catch {
-      return `${amount.toFixed(2)} ${currency}`;
-    }
-  };
 
   return (
     <div className="grid gap-4">
