@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import { calculateTextToSqlCost } from '@/app/(private)/text-to-sql/actions';
 import { ModelSelect, NumberField, Section } from '@/components/calc/calculator-fields';
 import { HelpTip } from '@/components/help/help-tip';
+import { TokenLab } from '@/components/help/token-lab';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
@@ -13,6 +14,7 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -30,6 +32,18 @@ export type TextToSqlModelOption = { id: string; provider: string; model: string
 const RECOMPUTE_DEBOUNCE_MS = 250;
 const MAX_DAYS_PER_MONTH = 31;
 const SEMANTIC_MODE_KEYS = ['none', 'headless', 'native'] as const;
+
+// Group benchmark scenarios by their dataset so the select reads as one entry
+// per benchmark, with the model options nested under it.
+function groupBenchmarks(benchmarks: TextToSqlBenchmarkDTO[]): [string, TextToSqlBenchmarkDTO[]][] {
+  const groups = new Map<string, TextToSqlBenchmarkDTO[]>();
+  for (const entry of benchmarks) {
+    const list = groups.get(entry.benchmark) ?? [];
+    list.push(entry);
+    groups.set(entry.benchmark, list);
+  }
+  return [...groups];
+}
 
 export function TextToSqlCostCalculator({
   models,
@@ -116,12 +130,17 @@ export function TextToSqlCostCalculator({
               <SelectContent>
                 <SelectGroup>
                   <SelectItem value={NO_BENCHMARK_ID}>{tt('noBenchmark')}</SelectItem>
-                  {benchmarks.map((entry) => (
-                    <SelectItem key={entry.id} value={entry.id}>
-                      {entry.benchmark} · {entry.provider} {entry.model}
-                    </SelectItem>
-                  ))}
                 </SelectGroup>
+                {groupBenchmarks(benchmarks).map(([name, entries]) => (
+                  <SelectGroup key={name}>
+                    <SelectLabel>{name}</SelectLabel>
+                    {entries.map((entry) => (
+                      <SelectItem key={entry.id} value={entry.id}>
+                        {entry.provider} · {entry.model}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                ))}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
@@ -176,6 +195,7 @@ export function TextToSqlCostCalculator({
               help={<HelpTip label={t('validationLoop.label')}>{t('validationLoop.body')}</HelpTip>}
             />
           </div>
+          <TokenLab />
         </Section>
 
         <Section

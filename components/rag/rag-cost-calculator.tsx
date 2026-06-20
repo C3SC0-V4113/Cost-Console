@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import { calculateRagCost } from '@/app/(private)/rag/actions';
 import { ModelSelect, NumberField, Section } from '@/components/calc/calculator-fields';
 import { HelpTip } from '@/components/help/help-tip';
+import { TokenLab } from '@/components/help/token-lab';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 
@@ -128,6 +129,7 @@ export function RagCostCalculator({
               onChange={(value) => update({ chunkOverlap: value })}
             />
           </div>
+          <TokenLab />
         </Section>
 
         <Section title={tr('sectionQuery')}>
