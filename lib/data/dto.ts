@@ -23,6 +23,19 @@ export type PricingSourceDTO = {
   retrievedAt: string;
 };
 
+export type TextToSqlBenchmarkDTO = {
+  id: string;
+  benchmark: string;
+  provider: string;
+  model: string;
+  metricType: string;
+  isOfficial: boolean;
+  baselineAccuracy: string;
+  semanticAccuracy: string;
+  notes: string | null;
+  source: PricingSourceDTO | null;
+};
+
 export type PricingCatalogDTO = {
   id: string;
   snapshotId: string;

@@ -2,7 +2,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { config as loadEnv } from 'dotenv';
 import { Pool } from 'pg';
 
-import { citedSources, pricingCatalog, pricingSnapshot } from './seed-data';
+import { citedSources, pricingCatalog, pricingSnapshot, textToSqlBenchmarks } from './seed-data';
 import { PrismaClient } from '../lib/generated/prisma/client';
 
 // Prisma 7 does not auto-load .env; the seed runs as its own process.
@@ -53,38 +53,80 @@ async function main(): Promise<void> {
       },
     });
 
-    await Promise.all(
-      pricingCatalog.map((entry) => {
-        const sourceReferenceId = sourceIdByKey.get(entry.sourceKey);
-        if (!sourceReferenceId) {
-          throw new Error(
-            `Catalog row ${entry.provider}/${entry.model} references unknown source ${entry.sourceKey}`
-          );
-        }
+    // Catalog rows and benchmark rows both depend only on the snapshot and the
+    // sources, not on each other, so they are created in one parallel batch.
+    const catalogCreates = pricingCatalog.map((entry) => {
+      const sourceReferenceId = sourceIdByKey.get(entry.sourceKey);
+      if (!sourceReferenceId) {
+        throw new Error(
+          `Catalog row ${entry.provider}/${entry.model} references unknown source ${entry.sourceKey}`
+        );
+      }
 
-        return prisma.pricingCatalog.create({
+      return prisma.pricingCatalog.create({
+        data: {
+          pricingSnapshotId: snapshot.id,
+          sourceReferenceId,
+          provider: entry.provider,
+          model: entry.model,
+          capability: entry.capability,
+          contextWindowTokens: entry.contextWindowTokens ?? null,
+          currency: entry.currency,
+          priceUnit: entry.priceUnit,
+          inputPrice: entry.inputPrice ?? null,
+          outputPrice: entry.outputPrice ?? null,
+          cachedInputReadPrice: entry.cachedInputReadPrice ?? null,
+          cacheWritePrice: entry.cacheWritePrice ?? null,
+          embeddingPrice: entry.embeddingPrice ?? null,
+          notes: entry.notes ?? null,
+        },
+      });
+    });
+
+    // Each paired benchmark becomes two rows: the baseline (text_to_sql_accuracy)
+    // and the semantic-layer result (semantic_layer_accuracy), sharing dataset,
+    // model, and cited source so the lab can pair them back into one scenario.
+    const benchmarkCreates = textToSqlBenchmarks.flatMap((entry) => {
+      const sourceReferenceId = sourceIdByKey.get(entry.sourceKey);
+      if (!sourceReferenceId) {
+        throw new Error(
+          `Benchmark ${entry.benchmark}/${entry.model} references unknown source ${entry.sourceKey}`
+        );
+      }
+
+      const base = {
+        sourceReferenceId,
+        provider: entry.provider,
+        model: entry.model,
+        datasetOrScenario: entry.benchmark,
+        metricType: entry.metricType,
+        metricUnit: 'percent',
+        isOfficial: entry.isOfficial,
+        notes: entry.notes ?? null,
+      };
+
+      return [
+        prisma.benchmarkResult.create({
           data: {
-            pricingSnapshotId: snapshot.id,
-            sourceReferenceId,
-            provider: entry.provider,
-            model: entry.model,
-            capability: entry.capability,
-            contextWindowTokens: entry.contextWindowTokens ?? null,
-            currency: entry.currency,
-            priceUnit: entry.priceUnit,
-            inputPrice: entry.inputPrice ?? null,
-            outputPrice: entry.outputPrice ?? null,
-            cachedInputReadPrice: entry.cachedInputReadPrice ?? null,
-            cacheWritePrice: entry.cacheWritePrice ?? null,
-            embeddingPrice: entry.embeddingPrice ?? null,
-            notes: entry.notes ?? null,
+            ...base,
+            benchmarkKind: 'text_to_sql_accuracy',
+            metricValue: entry.baselineAccuracy,
           },
-        });
-      })
-    );
+        }),
+        prisma.benchmarkResult.create({
+          data: {
+            ...base,
+            benchmarkKind: 'semantic_layer_accuracy',
+            metricValue: entry.semanticAccuracy,
+          },
+        }),
+      ];
+    });
+
+    await Promise.all([...catalogCreates, ...benchmarkCreates]);
 
     console.warn(
-      `Seeded ${citedSources.length} cited sources and ${pricingCatalog.length} pricing rows into snapshot "${snapshot.name}".`
+      `Seeded ${citedSources.length} cited sources, ${pricingCatalog.length} pricing rows, and ${textToSqlBenchmarks.length} text-to-sql benchmarks into snapshot "${snapshot.name}".`
     );
   } finally {
     await prisma.$disconnect();

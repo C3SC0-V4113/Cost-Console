@@ -25,7 +25,7 @@ import type { LucideIcon } from 'lucide-react';
 const playgrounds: ReadonlyArray<{ key: string; icon: LucideIcon; href?: string }> = [
   { key: 'chatCost', icon: MessageSquareText, href: '/chat' },
   { key: 'ragCostLab', icon: Workflow, href: '/rag' },
-  { key: 'textToSqlCostLab', icon: Database },
+  { key: 'textToSqlCostLab', icon: Database, href: '/text-to-sql' },
 ];
 
 export function ConsoleSidebar({ isAdmin }: Readonly<{ isAdmin: boolean }>) {

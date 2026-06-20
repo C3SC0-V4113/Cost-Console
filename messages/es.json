@@ -64,6 +64,22 @@
     "retrievedContext": {
       "label": "¿Qué son los tokens de contexto recuperado?",
       "body": "Los chunks que devuelve la recuperación pasan a formar parte de la solicitud final al LLM. Sus tokens se facturan como entrada de generación, no como embedding de la consulta."
+    },
+    "schemaContext": {
+      "label": "¿Qué es el contexto de esquema?",
+      "body": "Las definiciones de tablas, columnas y relaciones que se envían con cada pregunta para que el modelo escriba SQL válido. Es estático, así que es buen candidato para prompt caching."
+    },
+    "validationLoop": {
+      "label": "¿Qué es el ciclo de validación/reintento?",
+      "body": "Después de generar el SQL se puede validar; los fallos disparan intentos de reparación que vuelven a correr la generación. Menor precisión significa más reparaciones esperadas y mayor costo."
+    },
+    "semanticLayer": {
+      "label": "¿Qué hace una capa semántica?",
+      "body": "Una capa semántica agrega métricas, dimensiones y definiciones de joins al prompt. Cuesta tokens de contexto extra, pero suele mejorar la corrección y reducir el SQL ambiguo."
+    },
+    "accuracy": {
+      "label": "¿Cómo se usa la precisión?",
+      "body": "La precisión determina la cantidad esperada de intentos de reparación. Sin un benchmark seedeado es una estimación manual, no una medición citada."
     }
   },
   "themeSelector": {
@@ -384,6 +400,81 @@
       "currency": "Moneda",
       "topK": "Top-k",
       "queriesPerDay": "Consultas / día",
+      "cacheHitPercentage": "% aciertos de caché"
+    }
+  },
+  "textToSql": {
+    "metaTitle": "Text-to-SQL Cost Lab",
+    "metaDescription": "Compará Text-to-SQL crudo contra una capa semántica y un ciclo de validación/reintento: costo de tokens, precisión de benchmark y totales recurrentes.",
+    "eyebrow": "Playground de costo de Text-to-SQL",
+    "title": "Costo y precisión de Text-to-SQL",
+    "description": "Compará Text-to-SQL crudo, una capa semántica y un ciclo de validación/reintento. El costo corre sobre el snapshot de precios activo; la precisión es un resultado citado del benchmark elegido, no una suposición.",
+    "noPricing": "El snapshot activo no tiene modelos de chat ni benchmarks seedeados para modelar el costo de Text-to-SQL.",
+    "sectionModel": "Modelo de costo",
+    "modelLabel": "Modelo de generación (precios)",
+    "modelPlaceholder": "Elegí un modelo",
+    "sectionBenchmark": "Benchmark de precisión",
+    "benchmarkLabel": "Benchmark y modelo",
+    "benchmarkPlaceholder": "Elegí un benchmark",
+    "benchmarkNote": "La precisión es un resultado medido de este benchmark, con su fuente. El costo se modela con el modelo de precios de arriba; son independientes.",
+    "sectionSchema": "Esquema y contexto",
+    "questionTokens": "Tokens de la pregunta",
+    "schemaContextTokens": "Tokens de contexto de esquema",
+    "sqlOutputTokens": "Tokens de salida SQL",
+    "validationPromptTokens": "Tokens del prompt de validación",
+    "sectionSemantic": "Capa semántica",
+    "semanticMetadataTokens": "Tokens de metadatos semánticos",
+    "semanticModes": {
+      "none": "Ninguna",
+      "headless": "Capa semántica headless",
+      "native": "Capa semántica nativa"
+    },
+    "semanticModeHelp": {
+      "none": "Text-to-SQL crudo: el modelo escribe SQL directo contra el esquema, sin métricas ni definiciones de joins que lo guíen.",
+      "headless": "Una capa semántica independiente (ej. Cube) que se ubica entre el modelo y el warehouse, sirviendo métricas y definiciones por API sin importar la base de datos.",
+      "native": "Una capa semántica integrada en la plataforma de datos (ej. dbt), donde las métricas y modelos viven junto al warehouse y gobiernan la generación."
+    },
+    "sectionWorkload": "Volumen y caché",
+    "questionsPerDay": "Preguntas por día",
+    "daysPerMonth": "Días por mes",
+    "maxRepairAttempts": "Máx. intentos de reparación",
+    "cacheHitRate": "Tasa de aciertos de caché",
+    "cacheUnavailable": "{provider} no publica precios de caché, así que el contexto se factura como entrada regular.",
+    "costSummary": "Resumen de costo y precisión",
+    "calculating": "Calculando…",
+    "scenarios": {
+      "raw": "Text-to-SQL crudo",
+      "semantic": "Con capa semántica",
+      "semanticRetry": "Semántica + validación/reintento"
+    },
+    "lineItems": {
+      "question": "Pregunta / entrada",
+      "schema_context": "Contexto de esquema",
+      "semantic_context": "Contexto semántico",
+      "sql_output": "Salida SQL",
+      "validation_retry": "Validación / reintento"
+    },
+    "summary": {
+      "selectModel": "Elegí un modelo y un benchmark para estimar el costo de Text-to-SQL.",
+      "scenario": "Escenario",
+      "accuracy": "Precisión",
+      "perMonth": "Por mes",
+      "baselineAccuracy": "Base",
+      "semanticAccuracy": "Semántica",
+      "accuracyDelta": "Delta",
+      "accuracySource": "Fuente:",
+      "official": "Benchmark oficial",
+      "vendor": "Benchmark de proveedor",
+      "lineItem": "Concepto",
+      "tokens": "Tokens",
+      "perQuestion": "Costo / pregunta",
+      "warehouse": "Ejecución en warehouse",
+      "warehouseUnavailable": "No disponible (sin precio citado)",
+      "perQuestionSuffix": "/pregunta",
+      "model": "Modelo",
+      "currency": "Moneda",
+      "questionsPerDay": "Preguntas / día",
+      "maxRepairAttempts": "Máx. reparaciones",
       "cacheHitPercentage": "% aciertos de caché"
     }
   }

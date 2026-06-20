@@ -64,6 +64,22 @@
     "retrievedContext": {
       "label": "What are retrieved context tokens?",
       "body": "The chunks returned by retrieval become part of the final LLM request. Their tokens are billed as generation input, not as query embedding."
+    },
+    "schemaContext": {
+      "label": "What is schema context?",
+      "body": "The table definitions, columns, and relationships sent with each question so the model can write valid SQL. It is static, so it is a good candidate for prompt caching."
+    },
+    "validationLoop": {
+      "label": "What is the validation/retry loop?",
+      "body": "After SQL is generated it can be validated; failures trigger repair attempts that re-run generation. Lower accuracy means more expected repairs and higher cost."
+    },
+    "semanticLayer": {
+      "label": "What does a semantic layer do?",
+      "body": "A semantic layer adds metrics, dimensions, and join definitions to the prompt. It costs extra context tokens but usually improves correctness and reduces ambiguous SQL."
+    },
+    "accuracy": {
+      "label": "How is accuracy used?",
+      "body": "Accuracy drives the expected number of repair attempts. Without a seeded benchmark it is a manual estimate, not a source-backed measurement."
     }
   },
   "themeSelector": {
@@ -384,6 +400,81 @@
       "currency": "Currency",
       "topK": "Top-k",
       "queriesPerDay": "Queries / day",
+      "cacheHitPercentage": "Cache hit %"
+    }
+  },
+  "textToSql": {
+    "metaTitle": "Text-to-SQL Cost Lab",
+    "metaDescription": "Compare raw Text-to-SQL against a semantic layer and a validation/retry loop: token cost, benchmark accuracy, and recurring totals.",
+    "eyebrow": "Text-to-SQL cost playground",
+    "title": "Text-to-SQL cost and accuracy",
+    "description": "Compare raw Text-to-SQL, a semantic layer, and a validation/retry loop. Cost runs on the active pricing snapshot; accuracy is a cited result from the selected benchmark, not a guess.",
+    "noPricing": "The active snapshot has no chat models or seeded benchmarks to model Text-to-SQL cost.",
+    "sectionModel": "Cost model",
+    "modelLabel": "Generation model (pricing)",
+    "modelPlaceholder": "Select a model",
+    "sectionBenchmark": "Accuracy benchmark",
+    "benchmarkLabel": "Benchmark & model",
+    "benchmarkPlaceholder": "Select a benchmark",
+    "benchmarkNote": "Accuracy is a measured result from this benchmark, shown with its source. Cost is modeled on the pricing model above; the two are independent.",
+    "sectionSchema": "Schema & context",
+    "questionTokens": "Question tokens",
+    "schemaContextTokens": "Schema context tokens",
+    "sqlOutputTokens": "SQL output tokens",
+    "validationPromptTokens": "Validation prompt tokens",
+    "sectionSemantic": "Semantic layer",
+    "semanticMetadataTokens": "Semantic metadata tokens",
+    "semanticModes": {
+      "none": "None",
+      "headless": "Headless semantic layer",
+      "native": "Native semantic layer"
+    },
+    "semanticModeHelp": {
+      "none": "Raw Text-to-SQL: the model writes SQL straight against the schema, with no metric or join definitions to guide it.",
+      "headless": "A standalone semantic layer (e.g. Cube) that sits between the model and the warehouse, serving metrics and definitions via an API regardless of the database.",
+      "native": "A semantic layer built into the data platform (e.g. dbt), where metrics and models live alongside the warehouse and govern generation."
+    },
+    "sectionWorkload": "Workload & caching",
+    "questionsPerDay": "Questions per day",
+    "daysPerMonth": "Days per month",
+    "maxRepairAttempts": "Max repair attempts",
+    "cacheHitRate": "Cache hit rate",
+    "cacheUnavailable": "{provider} does not publish cache pricing, so context is billed as regular input.",
+    "costSummary": "Cost & accuracy summary",
+    "calculating": "Calculating…",
+    "scenarios": {
+      "raw": "Raw Text-to-SQL",
+      "semantic": "With semantic layer",
+      "semanticRetry": "Semantic + validation/retry"
+    },
+    "lineItems": {
+      "question": "Question / input",
+      "schema_context": "Schema context",
+      "semantic_context": "Semantic context",
+      "sql_output": "SQL output",
+      "validation_retry": "Validation / retry"
+    },
+    "summary": {
+      "selectModel": "Select a model and benchmark to estimate Text-to-SQL cost.",
+      "scenario": "Scenario",
+      "accuracy": "Accuracy",
+      "perMonth": "Per month",
+      "baselineAccuracy": "Baseline",
+      "semanticAccuracy": "Semantic",
+      "accuracyDelta": "Delta",
+      "accuracySource": "Source:",
+      "official": "Official benchmark",
+      "vendor": "Vendor benchmark",
+      "lineItem": "Line item",
+      "tokens": "Tokens",
+      "perQuestion": "Cost / question",
+      "warehouse": "Warehouse execution",
+      "warehouseUnavailable": "Not available (no source-backed price)",
+      "perQuestionSuffix": "/q",
+      "model": "Model",
+      "currency": "Currency",
+      "questionsPerDay": "Questions / day",
+      "maxRepairAttempts": "Max repairs",
       "cacheHitPercentage": "Cache hit %"
     }
   }

@@ -4,17 +4,9 @@ import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
 import { calculateRagCost } from '@/app/(private)/rag/actions';
-import { NumberField, Section } from '@/components/calc/calculator-fields';
+import { ModelSelect, NumberField, Section } from '@/components/calc/calculator-fields';
 import { HelpTip } from '@/components/help/help-tip';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 
 import { RagCostSummary } from './rag-cost-summary';
@@ -27,42 +19,6 @@ export type RagModelOption = { id: string; provider: string; model: string };
 
 const RECOMPUTE_DEBOUNCE_MS = 250;
 const MAX_DAYS_PER_MONTH = 31;
-
-function ModelSelect({
-  id,
-  label,
-  value,
-  options,
-  placeholder,
-  onChange,
-}: Readonly<{
-  id: string;
-  label: string;
-  value: string;
-  options: RagModelOption[];
-  placeholder: string;
-  onChange: (value: string) => void;
-}>) {
-  return (
-    <div className="grid gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id={id}>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            {options.map((option) => (
-              <SelectItem key={option.id} value={option.id}>
-                {option.provider} · {option.model}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}
 
 export function RagCostCalculator({
   embeddingModels,

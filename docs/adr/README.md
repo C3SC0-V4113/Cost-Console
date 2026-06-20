@@ -23,3 +23,5 @@ context.
 - [0005-define-postgresql-prisma-data-architecture.md](./0005-define-postgresql-prisma-data-architecture.md)
 - [0006-define-curated-pricing-and-benchmark-source-policy.md](./0006-define-curated-pricing-and-benchmark-source-policy.md)
 - [0007-adopt-identity-service-login-and-admin-managed-pricing-snapshots.md](./0007-adopt-identity-service-login-and-admin-managed-pricing-snapshots.md)
+- [0008-resolve-money-decimal-supabase-provider-and-prisma7-runtime.md](./0008-resolve-money-decimal-supabase-provider-and-prisma7-runtime.md)
+- [0009-source-text-to-sql-accuracy-from-cited-benchmarks.md](./0009-source-text-to-sql-accuracy-from-cited-benchmarks.md)

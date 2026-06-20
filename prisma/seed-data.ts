@@ -51,8 +51,27 @@ export type SnapshotSeed = {
   notes: string;
 };
 
+// A paired Text-to-SQL accuracy benchmark: one cited study reports a model's
+// accuracy both without a semantic layer (baseline) and with it. Each entry
+// expands to two `benchmark_result` rows (text_to_sql_accuracy and
+// semantic_layer_accuracy) so accuracy is a source-backed result, never a guess.
+export type BenchmarkEntry = {
+  sourceKey: string;
+  benchmark: string;
+  provider: string;
+  model: string;
+  metricType: string;
+  isOfficial: boolean;
+  baselineAccuracy: string;
+  semanticAccuracy: string;
+  notes?: string;
+};
+
 // Date every price row was retrieved from its official source.
 export const RETRIEVED_AT = '2026-06-14';
+
+// Date the Text-to-SQL benchmarks were retrieved from their published studies.
+export const BENCHMARK_RETRIEVED_AT = '2026-06-19';
 
 // Providers that publish prompt/context caching pricing. Used by tests and the
 // UI to distinguish "no cache price" from "cache not offered".
@@ -123,6 +142,88 @@ export const citedSources: CitedSource[] = [
     provider: 'Cohere',
     retrievedAt: RETRIEVED_AT,
     notes: 'Cohere does not publish prompt caching pricing for these models.',
+  },
+  {
+    key: 'dbt-sl-benchmark',
+    sourceType: 'vendor_benchmark',
+    title: 'Semantic Layer vs. Text-to-SQL: 2026 Benchmark Update',
+    url: 'https://docs.getdbt.com/blog/semantic-layer-vs-text-to-sql-2026',
+    provider: 'dbt Labs',
+    sourceDate: '2026-04-07',
+    retrievedAt: BENCHMARK_RETRIEVED_AT,
+    notes:
+      'Official dbt Labs benchmark on the ACME Insurance dataset, execution accuracy. dbt is a native, platform-integrated semantic layer.',
+  },
+  {
+    key: 'cube-sl-benchmark',
+    sourceType: 'vendor_benchmark',
+    title:
+      'Why semantic layers make LLM analytics reliable: a paired benchmark across three frontier models',
+    url: 'https://cube.dev/blog/why-semantic-layers-make-llm-analytics-reliable-a-paired-benchmark-across-three-frontier-models',
+    provider: 'Cube',
+    sourceDate: '2026-04-28',
+    retrievedAt: BENCHMARK_RETRIEVED_AT,
+    notes:
+      'Cube vendor benchmark on the Contoso Retail (ClickHouse) dataset, 100 questions. Cube is a headless semantic layer.',
+  },
+];
+
+// Text-to-SQL accuracy benchmarks. Accuracy is reported per model with and
+// without a semantic layer, so the lab reads it as a cited result instead of a
+// free input. Model names are the real benchmarked models from each study and
+// are independent of the simulated pricing catalog.
+export const textToSqlBenchmarks: BenchmarkEntry[] = [
+  // dbt Labs — native semantic layer (official, ACME Insurance, execution accuracy).
+  {
+    sourceKey: 'dbt-sl-benchmark',
+    benchmark: 'dbt Semantic Layer · ACME Insurance',
+    provider: 'Anthropic',
+    model: 'claude-sonnet-4-6',
+    metricType: 'execution_accuracy',
+    isOfficial: true,
+    baselineAccuracy: '90.0',
+    semanticAccuracy: '98.2',
+  },
+  {
+    sourceKey: 'dbt-sl-benchmark',
+    benchmark: 'dbt Semantic Layer · ACME Insurance',
+    provider: 'OpenAI',
+    model: 'gpt-5.3-codex',
+    metricType: 'execution_accuracy',
+    isOfficial: true,
+    baselineAccuracy: '84.1',
+    semanticAccuracy: '100.0',
+  },
+  // Cube — headless semantic layer (vendor, Contoso Retail, execution accuracy).
+  {
+    sourceKey: 'cube-sl-benchmark',
+    benchmark: 'Cube · Contoso Retail',
+    provider: 'Anthropic',
+    model: 'claude-opus-4-7',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '50.5',
+    semanticAccuracy: '67.7',
+  },
+  {
+    sourceKey: 'cube-sl-benchmark',
+    benchmark: 'Cube · Contoso Retail',
+    provider: 'Anthropic',
+    model: 'claude-sonnet-4-6',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '46.5',
+    semanticAccuracy: '68.7',
+  },
+  {
+    sourceKey: 'cube-sl-benchmark',
+    benchmark: 'Cube · Contoso Retail',
+    provider: 'OpenAI',
+    model: 'gpt-5.4',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '45.5',
+    semanticAccuracy: '68.7',
   },
 ];
 

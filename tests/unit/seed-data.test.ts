@@ -5,6 +5,7 @@ import {
   citedSources,
   pricingCatalog,
   pricingSnapshot,
+  textToSqlBenchmarks,
 } from '../../prisma/seed-data';
 
 const sourcesByKey = new Map(citedSources.map((source) => [source.key, source]));
@@ -86,5 +87,41 @@ describe('cited pricing seed data', () => {
       expect(entry.cachedInputReadPrice).toBeUndefined();
       expect(entry.cacheWritePrice).toBeUndefined();
     }
+  });
+});
+
+describe('cited text-to-sql benchmarks', () => {
+  it('seeds paired accuracy benchmarks', () => {
+    expect(textToSqlBenchmarks.length).toBeGreaterThan(0);
+  });
+
+  it('links every benchmark to a citable source with url and retrievedAt', () => {
+    for (const entry of textToSqlBenchmarks) {
+      const source = sourcesByKey.get(entry.sourceKey);
+
+      expect(source, `${entry.benchmark}/${entry.model} has a known source`).toBeDefined();
+      expect(source?.url).toMatch(/^https:\/\//);
+      expect(source?.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(source?.sourceType).toBe('vendor_benchmark');
+    }
+  });
+
+  it('reports baseline and semantic accuracy as in-range percentages, semantic >= baseline', () => {
+    for (const entry of textToSqlBenchmarks) {
+      const baseline = Number(entry.baselineAccuracy);
+      const semantic = Number(entry.semanticAccuracy);
+
+      expect(baseline).toBeGreaterThanOrEqual(0);
+      expect(semantic).toBeLessThanOrEqual(100);
+      expect(semantic).toBeGreaterThanOrEqual(baseline);
+    }
+  });
+
+  it('has no duplicate benchmark/provider/model rows', () => {
+    const keys = textToSqlBenchmarks.map(
+      (entry) => `${entry.benchmark}/${entry.provider}/${entry.model}`
+    );
+
+    expect(new Set(keys).size).toBe(keys.length);
   });
 });

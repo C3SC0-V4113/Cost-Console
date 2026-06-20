@@ -1,11 +1,58 @@
+/* eslint-disable react-doctor/no-multi-comp -- intentional collection of shared, dumb form primitives (NumberField, Section, ModelSelect) used across the cost calculators */
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 import type { ReactNode } from 'react';
 
 // Shared presentational building blocks for the cost calculators (chat, RAG, and
-// later text-to-SQL). Kept dumb and styling-only so each calculator composes the
-// same dense, aligned form layout (DESIGN.md) without duplicating markup.
+// text-to-SQL). Kept dumb and styling-only so each calculator composes the same
+// dense, aligned form layout (DESIGN.md) without duplicating markup.
+
+export type ModelOption = { id: string; provider: string; model: string };
+
+export function ModelSelect({
+  id,
+  label,
+  value,
+  options,
+  placeholder,
+  onChange,
+}: Readonly<{
+  id: string;
+  label: string;
+  value: string;
+  options: ModelOption[];
+  placeholder: string;
+  onChange: (value: string) => void;
+}>) {
+  return (
+    <div className="grid gap-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id={id}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            {options.map((option) => (
+              <SelectItem key={option.id} value={option.id}>
+                {option.provider} · {option.model}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
 
 function toNonNegativeInt(value: string): number {
   const parsed = Number.parseInt(value, 10);
