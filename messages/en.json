@@ -416,13 +416,17 @@
     "sectionBenchmark": "Accuracy benchmark",
     "benchmarkLabel": "Benchmark & model",
     "benchmarkPlaceholder": "Select a benchmark",
+    "noBenchmark": "No benchmark (raw cost only)",
     "benchmarkNote": "Accuracy is a measured result from this benchmark, shown with its source. Cost is modeled on the pricing model above; the two are independent.",
+    "noBenchmarkNote": "Without a benchmark, only raw Text-to-SQL cost is modeled — no accuracy claim and no semantic-layer scenario.",
+    "includeRetry": "Include validation / retry loop",
     "sectionSchema": "Schema & context",
     "questionTokens": "Question tokens",
     "schemaContextTokens": "Schema context tokens",
     "sqlOutputTokens": "SQL output tokens",
     "validationPromptTokens": "Validation prompt tokens",
     "sectionSemantic": "Semantic layer",
+    "semanticDisabled": "Select a semantic-layer benchmark to model the semantic-layer scenario.",
     "semanticMetadataTokens": "Semantic metadata tokens",
     "semanticModes": {
       "none": "None",
@@ -463,8 +467,6 @@
       "semanticAccuracy": "Semantic",
       "accuracyDelta": "Delta",
       "accuracySource": "Source:",
-      "official": "Official benchmark",
-      "vendor": "Vendor benchmark",
       "lineItem": "Line item",
       "tokens": "Tokens",
       "perQuestion": "Cost / question",
@@ -474,7 +476,6 @@
       "model": "Model",
       "currency": "Currency",
       "questionsPerDay": "Questions / day",
-      "maxRepairAttempts": "Max repairs",
       "cacheHitPercentage": "Cache hit %"
     }
   }

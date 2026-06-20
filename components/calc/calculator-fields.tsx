@@ -64,18 +64,22 @@ export function NumberField({
   label,
   value,
   help,
+  disabled = false,
   onChange,
 }: Readonly<{
   id: string;
   label: string;
   value: number;
   help?: ReactNode;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }>) {
   return (
     <div className="grid gap-1.5">
       <div className="flex min-h-5 items-center gap-1">
-        <Label htmlFor={id}>{label}</Label>
+        <Label htmlFor={id} className={disabled ? 'text-muted-foreground' : undefined}>
+          {label}
+        </Label>
         {help}
       </div>
       <Input
@@ -84,6 +88,7 @@ export function NumberField({
         inputMode="numeric"
         min={0}
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(toNonNegativeInt(event.target.value))}
       />
     </div>

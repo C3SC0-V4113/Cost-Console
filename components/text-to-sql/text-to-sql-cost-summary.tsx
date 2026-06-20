@@ -3,14 +3,11 @@
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { SourceTag } from '@/components/help/source-tag';
-import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
-import type { TextToSqlCostResult, TextToSqlScenarioKey } from '@/lib/calc/text-to-sql-cost';
+import type { TextToSqlCostResult } from '@/lib/calc/text-to-sql-cost';
 import type { TextToSqlBenchmarkDTO } from '@/lib/data/dto';
-
-const SCENARIO_ORDER: readonly TextToSqlScenarioKey[] = ['raw', 'semantic', 'semanticRetry'];
 
 function signed(value: number): string {
   return value >= 0 ? `+${value}` : `${value}`;
@@ -42,85 +39,86 @@ export function TextToSqlCostSummary({
   }
 
   const tokens = (value: string): string => format.number(Number(value));
-  const detailScenario = result.scenarios.semanticRetry;
-  const delta = result.accuracy.deltaPercentage;
-  // Show one decimal (trailing zero stripped) to avoid overflow; the tooltip
-  // carries the full value.
-  const deltaDisplay = signed(Number(delta.toFixed(1)));
-  const deltaFull = `${signed(delta)}%`;
+  const detailScenario = result.scenarios[result.scenarios.length - 1];
+  const accuracy = result.accuracy;
+  const hasAccuracy = accuracy !== null;
+  // Two columns without accuracy, three with it.
+  const tableCols = hasAccuracy
+    ? 'grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,1fr))]'
+    : 'grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]';
 
   return (
     <div className="grid gap-4">
-      {/* Three-way scenario comparison (views.md): raw vs semantic vs +retry. */}
+      {/* Scenario comparison — only the scenarios the selection supports. */}
       <div className="overflow-hidden rounded-xl border border-border">
-        <div className="grid grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,1fr))] gap-4 border-b border-border bg-muted/40 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+        <div
+          className={`grid ${tableCols} gap-4 border-b border-border bg-muted/40 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase`}
+        >
           <span>{t('summary.scenario')}</span>
-          <span className="text-right">{t('summary.accuracy')}</span>
+          {hasAccuracy ? <span className="text-right">{t('summary.accuracy')}</span> : null}
           <span className="text-right">{t('summary.perMonth')}</span>
         </div>
         <div className="divide-y divide-border">
-          {SCENARIO_ORDER.map((key) => {
-            const scenario = result.scenarios[key];
-            return (
-              <div
-                key={key}
-                className="grid grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,1fr))] items-center gap-4 px-4 py-3 text-sm"
-              >
-                <span className="font-medium text-foreground">{t(`scenarios.${key}`)}</span>
+          {result.scenarios.map((scenario) => (
+            <div
+              key={scenario.key}
+              className={`grid ${tableCols} items-center gap-4 px-4 py-3 text-sm`}
+            >
+              <span className="font-medium text-foreground">{t(`scenarios.${scenario.key}`)}</span>
+              {hasAccuracy ? (
                 <span className="text-right text-muted-foreground tabular-nums">
-                  {scenario.accuracyPercentage}%
+                  {scenario.accuracyPercentage === null ? '—' : `${scenario.accuracyPercentage}%`}
                 </span>
-                <span className="text-right font-medium text-foreground tabular-nums">
-                  {formatCurrency(scenario.monthlyCost)}
-                </span>
-              </div>
-            );
-          })}
+              ) : null}
+              <span className="text-right font-medium text-foreground tabular-nums">
+                {formatCurrency(scenario.monthlyCost)}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Accuracy is a source-backed result from the selected benchmark. */}
-      <div className="grid gap-3 rounded-xl border border-border bg-muted p-4">
-        <div className="grid grid-cols-3 gap-3 text-sm">
-          <div className="grid gap-0.5">
-            <span className="text-xs text-muted-foreground">{t('summary.baselineAccuracy')}</span>
-            <span className="font-semibold text-foreground tabular-nums">
-              {result.accuracy.baselinePercentage}%
-            </span>
+      {/* Accuracy is a source-backed result; the source sits on its own line. */}
+      {accuracy && benchmark ? (
+        <div className="grid gap-3 rounded-xl border border-border bg-muted p-4">
+          <div className="grid grid-cols-3 gap-3 text-sm">
+            <div className="grid gap-0.5">
+              <span className="text-xs text-muted-foreground">{t('summary.baselineAccuracy')}</span>
+              <span className="font-semibold text-foreground tabular-nums">
+                {accuracy.baselinePercentage}%
+              </span>
+            </div>
+            <div className="grid gap-0.5">
+              <span className="text-xs text-muted-foreground">{t('summary.semanticAccuracy')}</span>
+              <span className="font-semibold text-foreground tabular-nums">
+                {accuracy.semanticPercentage}%
+              </span>
+            </div>
+            <div className="grid gap-0.5">
+              <span className="text-xs text-muted-foreground">{t('summary.accuracyDelta')}</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="w-fit cursor-help font-semibold text-foreground tabular-nums underline decoration-muted-foreground/60 decoration-dotted underline-offset-4">
+                    {signed(Number(accuracy.deltaPercentage.toFixed(1)))}%
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{signed(accuracy.deltaPercentage)}%</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
-          <div className="grid gap-0.5">
-            <span className="text-xs text-muted-foreground">{t('summary.semanticAccuracy')}</span>
-            <span className="font-semibold text-foreground tabular-nums">
-              {result.accuracy.semanticPercentage}%
+          <div className="grid gap-1.5 text-xs">
+            <span className="text-muted-foreground">
+              {t('summary.accuracySource')} {benchmark.benchmark} · {benchmark.provider}{' '}
+              {benchmark.model}
             </span>
-          </div>
-          <div className="grid gap-0.5">
-            <span className="text-xs text-muted-foreground">{t('summary.accuracyDelta')}</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="w-fit cursor-default font-semibold text-foreground tabular-nums">
-                  {deltaDisplay}%
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{deltaFull}</TooltipContent>
-            </Tooltip>
+            <div>
+              <SourceTag source={benchmark.source} />
+            </div>
           </div>
         </div>
-        {benchmark ? (
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-muted-foreground">{t('summary.accuracySource')}</span>
-            <span className="font-medium text-foreground">
-              {benchmark.benchmark} · {benchmark.provider} {benchmark.model}
-            </span>
-            <Badge variant="secondary">
-              {benchmark.isOfficial ? t('summary.official') : t('summary.vendor')}
-            </Badge>
-            <SourceTag source={benchmark.source} />
-          </div>
-        ) : null}
-      </div>
+      ) : null}
 
-      {/* Per-question line items for the full semantic + validation/retry scenario. */}
+      {/* Per-question line items for the most complete selected scenario. */}
       <div className="overflow-hidden rounded-xl border border-border">
         <div className="hidden grid-cols-[minmax(0,1.5fr)_repeat(2,minmax(0,1fr))] gap-4 border-b border-border bg-muted/40 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase sm:grid">
           <span>{t('summary.lineItem')}</span>
@@ -162,10 +160,6 @@ export function TextToSqlCostSummary({
         <Assumption
           label={t('summary.questionsPerDay')}
           value={String(result.assumptions.questionsPerDay)}
-        />
-        <Assumption
-          label={t('summary.maxRepairAttempts')}
-          value={String(result.assumptions.maxRepairAttempts)}
         />
         <Assumption
           label={t('summary.cacheHitPercentage')}

@@ -4,9 +4,15 @@
 //
 // Accuracy is intentionally NOT an input: it is resolved from the selected
 // benchmark scenario (a cited, source-backed result), never typed by the user.
+
+// Sentinel benchmark selection meaning "no benchmark / no semantic layer": only
+// the raw scenario is modeled and the semantic-layer section is disabled.
+export const NO_BENCHMARK_ID = 'none';
+
 export type TextToSqlCalculatorInputs = {
   model: string;
   benchmarkId: string;
+  includeRetry: boolean;
   questionsPerDay: number;
   daysPerMonth: number;
   questionTokens: number;
@@ -20,6 +26,7 @@ export type TextToSqlCalculatorInputs = {
 
 export const DEFAULT_TEXT_TO_SQL_INPUTS: Omit<TextToSqlCalculatorInputs, 'model' | 'benchmarkId'> =
   {
+    includeRetry: false,
     questionsPerDay: 200,
     daysPerMonth: 30,
     questionTokens: 40,

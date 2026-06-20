@@ -31,9 +31,11 @@ const input: TextToSqlCostInput = {
   sqlOutputTokens: 120,
   validationPromptTokens: 300,
   maxRepairAttempts: 2,
+  promptCacheHitPercentage: 0,
+  includeSemantic: true,
+  includeRetry: true,
   baselineAccuracyPercentage: 60,
   semanticAccuracyPercentage: 85,
-  promptCacheHitPercentage: 0,
 };
 
 const benchmark: TextToSqlBenchmarkDTO = {
@@ -76,14 +78,15 @@ describe('TextToSqlCostSummary', () => {
     expect(screen.getByText(/53,83\sUS\$/u)).toBeTruthy();
   });
 
-  it('shows accuracy as a cited benchmark result, not an input', () => {
+  it('shows accuracy as a cited benchmark result with its source', () => {
     renderSummary();
 
     expect(screen.getByText('+25%')).toBeTruthy();
     expect(
-      screen.getByText('dbt Semantic Layer · ACME Insurance · OpenAI gpt-5.3-codex')
+      screen.getByText(/dbt Semantic Layer · ACME Insurance · OpenAI gpt-5\.3-codex/u)
     ).toBeTruthy();
-    expect(screen.getByText('Benchmark oficial')).toBeTruthy();
+    // The source is surfaced via the SourceTag affordance (vendor benchmark).
+    expect(screen.getByText('Benchmark del proveedor')).toBeTruthy();
   });
 
   it('breaks down the validation/retry line item and warehouse state', () => {
@@ -91,6 +94,30 @@ describe('TextToSqlCostSummary', () => {
 
     expect(screen.getByText('Validación / reintento')).toBeTruthy();
     expect(screen.getByText('No disponible (sin precio citado)')).toBeTruthy();
+  });
+
+  it('shows only the raw scenario and no accuracy without a benchmark', () => {
+    const rawResult = computeTextToSqlCost(
+      {
+        ...input,
+        includeSemantic: false,
+        includeRetry: false,
+        baselineAccuracyPercentage: null,
+        semanticAccuracyPercentage: null,
+      },
+      pricing
+    );
+    render(
+      <NextIntlClientProvider locale="es" messages={esMessages} timeZone="UTC">
+        <TooltipProvider>
+          <TextToSqlCostSummary result={rawResult} benchmark={null} />
+        </TooltipProvider>
+      </NextIntlClientProvider>
+    );
+
+    expect(screen.getByText('Text-to-SQL crudo')).toBeTruthy();
+    expect(screen.queryByText('Con capa semántica')).toBeNull();
+    expect(screen.queryByText('+25%')).toBeNull();
   });
 
   it('renders a placeholder when there is no result', () => {

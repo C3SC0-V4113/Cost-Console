@@ -416,13 +416,17 @@
     "sectionBenchmark": "Benchmark de precisión",
     "benchmarkLabel": "Benchmark y modelo",
     "benchmarkPlaceholder": "Elegí un benchmark",
+    "noBenchmark": "Sin benchmark (solo costo crudo)",
     "benchmarkNote": "La precisión es un resultado medido de este benchmark, con su fuente. El costo se modela con el modelo de precios de arriba; son independientes.",
+    "noBenchmarkNote": "Sin benchmark solo se modela el costo de Text-to-SQL crudo — sin afirmación de precisión ni escenario de capa semántica.",
+    "includeRetry": "Incluir ciclo de validación / reintento",
     "sectionSchema": "Esquema y contexto",
     "questionTokens": "Tokens de la pregunta",
     "schemaContextTokens": "Tokens de contexto de esquema",
     "sqlOutputTokens": "Tokens de salida SQL",
     "validationPromptTokens": "Tokens del prompt de validación",
     "sectionSemantic": "Capa semántica",
+    "semanticDisabled": "Elegí un benchmark con capa semántica para modelar el escenario de capa semántica.",
     "semanticMetadataTokens": "Tokens de metadatos semánticos",
     "semanticModes": {
       "none": "Ninguna",
@@ -463,8 +467,6 @@
       "semanticAccuracy": "Semántica",
       "accuracyDelta": "Delta",
       "accuracySource": "Fuente:",
-      "official": "Benchmark oficial",
-      "vendor": "Benchmark de proveedor",
       "lineItem": "Concepto",
       "tokens": "Tokens",
       "perQuestion": "Costo / pregunta",
@@ -474,7 +476,6 @@
       "model": "Modelo",
       "currency": "Moneda",
       "questionsPerDay": "Preguntas / día",
-      "maxRepairAttempts": "Máx. reparaciones",
       "cacheHitPercentage": "% aciertos de caché"
     }
   }

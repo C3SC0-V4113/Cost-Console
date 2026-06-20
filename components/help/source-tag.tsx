@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Info } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { Badge } from '@/components/ui/badge';
@@ -47,9 +47,12 @@ export function SourceTag({ source }: Readonly<{ source: PricingSourceDTO | null
         <button
           type="button"
           aria-label={t('ariaLabel', { title: source.title })}
-          className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="cursor-help rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
-          <Badge variant="secondary">{typeLabel}</Badge>
+          <Badge variant="secondary">
+            <span>{typeLabel}</span>
+            <Info data-icon="inline-end" />
+          </Badge>
         </button>
       </HoverCardTrigger>
       <HoverCardContent align="start" className="w-80">

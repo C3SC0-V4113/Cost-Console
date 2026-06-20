@@ -38,9 +38,14 @@ export type TextToSqlCostInput = {
   sqlOutputTokens: number;
   validationPromptTokens: number;
   maxRepairAttempts: number;
-  baselineAccuracyPercentage: number;
-  semanticAccuracyPercentage: number;
   promptCacheHitPercentage: number;
+  // Whether a semantic-layer benchmark is selected (adds the semantic scenario)
+  // and whether the validation/retry loop is included (adds the retry scenario).
+  includeSemantic: boolean;
+  includeRetry: boolean;
+  // Accuracy comes from the selected benchmark; null when no benchmark is chosen.
+  baselineAccuracyPercentage: number | null;
+  semanticAccuracyPercentage: number | null;
 };
 
 export type TextToSqlScenarioKey = 'raw' | 'semantic' | 'semanticRetry';
@@ -61,7 +66,7 @@ export type TextToSqlLineItem = {
 export type TextToSqlScenario = {
   key: TextToSqlScenarioKey;
   lineItems: TextToSqlLineItem[];
-  accuracyPercentage: number;
+  accuracyPercentage: number | null;
   costPerQuestion: string;
   dailyCost: string;
   monthlyCost: string;
@@ -71,15 +76,19 @@ export type TextToSqlScenario = {
     | { available: true; costPerQuestion: string; monthlyCost: string };
 };
 
+export type TextToSqlAccuracySummary = {
+  baselinePercentage: number;
+  semanticPercentage: number;
+  deltaPercentage: number;
+};
+
 export type TextToSqlCostResult = {
   currency: string;
   cacheAvailable: boolean;
-  scenarios: Record<TextToSqlScenarioKey, TextToSqlScenario>;
-  accuracy: {
-    baselinePercentage: number;
-    semanticPercentage: number;
-    deltaPercentage: number;
-  };
+  // Ordered: always `raw`, plus `semantic` and `semanticRetry` when selected.
+  scenarios: TextToSqlScenario[];
+  // Null when no benchmark is selected (cost only, no accuracy claim).
+  accuracy: TextToSqlAccuracySummary | null;
   assumptions: {
     provider: string;
     model: string;
@@ -136,7 +145,7 @@ export function computeTextToSqlCost(
 
   const buildScenario = (
     key: TextToSqlScenarioKey,
-    options: Readonly<{ semantic: boolean; retry: boolean; accuracyPercentage: number }>
+    options: Readonly<{ semantic: boolean; retry: boolean; accuracyPercentage: number | null }>
   ): TextToSqlScenario => {
     const semanticTokens = options.semantic ? input.semanticMetadataTokens : 0;
 
@@ -176,7 +185,9 @@ export function computeTextToSqlCost(
     if (options.retry) {
       // Lower accuracy means more expected repair passes; each repair re-runs
       // generation, and every question pays one validation pass.
-      const failureRate = new Decimal(100 - clampPercentage(options.accuracyPercentage)).div(100);
+      const failureRate = new Decimal(100 - clampPercentage(options.accuracyPercentage ?? 100)).div(
+        100
+      );
       const expectedRepairs = failureRate.mul(input.maxRepairAttempts);
       const validationCost = inputBucketCost(input.validationPromptTokens, false);
       const retryCost = expectedRepairs.mul(generationCost);
@@ -224,37 +235,54 @@ export function computeTextToSqlCost(
     };
   };
 
-  const scenarios: Record<TextToSqlScenarioKey, TextToSqlScenario> = {
-    raw: buildScenario('raw', {
+  // Always model raw Text-to-SQL. The semantic and retry scenarios are only
+  // added when a semantic-layer benchmark / the retry loop are selected, so the
+  // summary never shows a fabricated continuum the data does not support.
+  const scenarios: TextToSqlScenario[] = [
+    buildScenario('raw', {
       semantic: false,
       retry: false,
       accuracyPercentage: input.baselineAccuracyPercentage,
     }),
-    semantic: buildScenario('semantic', {
-      semantic: true,
-      retry: false,
-      accuracyPercentage: input.semanticAccuracyPercentage,
-    }),
-    semanticRetry: buildScenario('semanticRetry', {
-      semantic: true,
-      retry: true,
-      accuracyPercentage: input.semanticAccuracyPercentage,
-    }),
-  };
+  ];
+  if (input.includeSemantic) {
+    scenarios.push(
+      buildScenario('semantic', {
+        semantic: true,
+        retry: false,
+        accuracyPercentage: input.semanticAccuracyPercentage,
+      })
+    );
+    if (input.includeRetry) {
+      scenarios.push(
+        buildScenario('semanticRetry', {
+          semantic: true,
+          retry: true,
+          accuracyPercentage: input.semanticAccuracyPercentage,
+        })
+      );
+    }
+  }
+
+  const accuracy: TextToSqlAccuracySummary | null =
+    input.baselineAccuracyPercentage !== null && input.semanticAccuracyPercentage !== null
+      ? {
+          baselinePercentage: input.baselineAccuracyPercentage,
+          semanticPercentage: input.semanticAccuracyPercentage,
+          // Round to the benchmark's 4-decimal scale so float subtraction does
+          // not leak noise like 8.200000000000003 into the UI.
+          deltaPercentage:
+            Math.round(
+              (input.semanticAccuracyPercentage - input.baselineAccuracyPercentage) * 1e4
+            ) / 1e4,
+        }
+      : null;
 
   return {
     currency: pricing.currency,
     cacheAvailable: isCacheAvailable,
     scenarios,
-    accuracy: {
-      baselinePercentage: input.baselineAccuracyPercentage,
-      semanticPercentage: input.semanticAccuracyPercentage,
-      // Round to the benchmark's 4-decimal scale so float subtraction does not
-      // leak noise like 8.200000000000003 into the UI.
-      deltaPercentage:
-        Math.round((input.semanticAccuracyPercentage - input.baselineAccuracyPercentage) * 1e4) /
-        1e4,
-    },
+    accuracy,
     assumptions: {
       provider: pricing.generation.provider,
       model: pricing.generation.model,

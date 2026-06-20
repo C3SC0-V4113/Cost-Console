@@ -6,6 +6,7 @@ import { useRef, useState } from 'react';
 import { calculateTextToSqlCost } from '@/app/(private)/text-to-sql/actions';
 import { ModelSelect, NumberField, Section } from '@/components/calc/calculator-fields';
 import { HelpTip } from '@/components/help/help-tip';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -18,7 +19,7 @@ import {
 import { Slider } from '@/components/ui/slider';
 
 import { TextToSqlCostSummary } from './text-to-sql-cost-summary';
-import { DEFAULT_TEXT_TO_SQL_INPUTS } from './text-to-sql-inputs';
+import { DEFAULT_TEXT_TO_SQL_INPUTS, NO_BENCHMARK_ID } from './text-to-sql-inputs';
 
 import type { TextToSqlCalculatorInputs } from './text-to-sql-inputs';
 import type { TextToSqlCostResult } from '@/lib/calc/text-to-sql-cost';
@@ -45,7 +46,7 @@ export function TextToSqlCostCalculator({
   const tt = useTranslations('textToSql');
   const [inputs, setInputs] = useState<TextToSqlCalculatorInputs>(() => ({
     model: models[0]?.id ?? '',
-    benchmarkId: benchmarks[0]?.id ?? '',
+    benchmarkId: benchmarks[0]?.id ?? NO_BENCHMARK_ID,
     ...DEFAULT_TEXT_TO_SQL_INPUTS,
   }));
   const [result, setResult] = useState<TextToSqlCostResult | null>(defaultResult);
@@ -77,6 +78,7 @@ export function TextToSqlCostCalculator({
   }
 
   const isCacheAvailable = result?.cacheAvailable ?? true;
+  const hasBenchmark = inputs.benchmarkId !== NO_BENCHMARK_ID;
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
@@ -100,13 +102,20 @@ export function TextToSqlCostCalculator({
             <Label htmlFor="text-to-sql-benchmark">{tt('benchmarkLabel')}</Label>
             <Select
               value={inputs.benchmarkId}
-              onValueChange={(value) => update({ benchmarkId: value })}
+              onValueChange={(value) =>
+                update({
+                  benchmarkId: value,
+                  // Retry only applies with a semantic-layer benchmark.
+                  includeRetry: value === NO_BENCHMARK_ID ? false : inputs.includeRetry,
+                })
+              }
             >
               <SelectTrigger id="text-to-sql-benchmark">
                 <SelectValue placeholder={tt('benchmarkPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
+                  <SelectItem value={NO_BENCHMARK_ID}>{tt('noBenchmark')}</SelectItem>
                   {benchmarks.map((entry) => (
                     <SelectItem key={entry.id} value={entry.id}>
                       {entry.benchmark} · {entry.provider} {entry.model}
@@ -115,7 +124,25 @@ export function TextToSqlCostCalculator({
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">{tt('benchmarkNote')}</p>
+            <p className="text-xs text-muted-foreground">
+              {hasBenchmark ? tt('benchmarkNote') : tt('noBenchmarkNote')}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="text-to-sql-retry"
+              checked={inputs.includeRetry}
+              disabled={!hasBenchmark}
+              onCheckedChange={(checked) => update({ includeRetry: checked === true })}
+            />
+            <Label
+              htmlFor="text-to-sql-retry"
+              className={!hasBenchmark ? 'text-muted-foreground' : undefined}
+            >
+              {tt('includeRetry')}
+            </Label>
+            <HelpTip label={t('validationLoop.label')}>{t('validationLoop.body')}</HelpTip>
           </div>
         </Section>
 
@@ -144,6 +171,7 @@ export function TextToSqlCostCalculator({
               id="validation-prompt-tokens"
               label={tt('validationPromptTokens')}
               value={inputs.validationPromptTokens}
+              disabled={!hasBenchmark || !inputs.includeRetry}
               onChange={(value) => update({ validationPromptTokens: value })}
               help={<HelpTip label={t('validationLoop.label')}>{t('validationLoop.body')}</HelpTip>}
             />
@@ -154,10 +182,14 @@ export function TextToSqlCostCalculator({
           title={tt('sectionSemantic')}
           help={<HelpTip label={t('semanticLayer.label')}>{t('semanticLayer.body')}</HelpTip>}
         >
+          {hasBenchmark ? null : (
+            <p className="text-sm text-muted-foreground">{tt('semanticDisabled')}</p>
+          )}
           <NumberField
             id="semantic-metadata-tokens"
             label={tt('semanticMetadataTokens')}
             value={inputs.semanticMetadataTokens}
+            disabled={!hasBenchmark}
             onChange={(value) => update({ semanticMetadataTokens: value })}
           />
           <dl className="grid gap-2 rounded-xl border border-border bg-muted/40 p-3 text-xs">
@@ -200,6 +232,7 @@ export function TextToSqlCostCalculator({
               id="max-repair-attempts"
               label={tt('maxRepairAttempts')}
               value={inputs.maxRepairAttempts}
+              disabled={!hasBenchmark || !inputs.includeRetry}
               onChange={(value) => update({ maxRepairAttempts: value })}
               help={<HelpTip label={t('validationLoop.label')}>{t('validationLoop.body')}</HelpTip>}
             />

@@ -41,6 +41,7 @@ export default async function TextToSqlCostPage() {
     defaultResult = computeTextToSqlCost(
       {
         ...DEFAULT_TEXT_TO_SQL_INPUTS,
+        includeSemantic: true,
         baselineAccuracyPercentage: Number(firstBenchmark.baselineAccuracy),
         semanticAccuracyPercentage: Number(firstBenchmark.semanticAccuracy),
       },
