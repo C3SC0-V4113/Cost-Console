@@ -28,12 +28,12 @@ export function TokenLab() {
           {t('trigger')}
         </Button>
       </SheetTrigger>
-      <SheetContent className="gap-0">
+      <SheetContent className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>{t('title')}</SheetTitle>
           <SheetDescription>{t('description')}</SheetDescription>
         </SheetHeader>
-        <div className="px-4 pb-4">
+        <div className="flex-1 overflow-y-auto px-4 pb-4">
           <TokenEstimator />
         </div>
       </SheetContent>

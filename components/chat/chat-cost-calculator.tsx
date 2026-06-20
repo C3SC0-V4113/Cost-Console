@@ -5,20 +5,12 @@ import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
 import { calculateChatCost } from '@/app/(private)/chat/actions';
-import { NumberField, Section } from '@/components/calc/calculator-fields';
+import { ModelSelect, NumberField, Section } from '@/components/calc/calculator-fields';
 import { HelpTip } from '@/components/help/help-tip';
 import { TokenEstimator } from '@/components/help/token-estimator';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 
 import { DEFAULT_CHAT_INPUTS } from './chat-inputs';
@@ -71,23 +63,14 @@ export function ChatCostCalculator({
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
       <div className="grid gap-5">
         <Section title={tc('sectionModel')}>
-          <div className="grid gap-1.5">
-            <Label htmlFor="chat-model">{tc('modelLabel')}</Label>
-            <Select value={inputs.model} onValueChange={(value) => update({ model: value })}>
-              <SelectTrigger id="chat-model">
-                <SelectValue placeholder={tc('modelPlaceholder')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  {models.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>
-                      {option.provider} · {option.model}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+          <ModelSelect
+            id="chat-model"
+            label={tc('modelLabel')}
+            value={inputs.model}
+            options={models}
+            placeholder={tc('modelPlaceholder')}
+            onChange={(value) => update({ model: value })}
+          />
         </Section>
 
         <Section title={tc('sectionVolume')}>

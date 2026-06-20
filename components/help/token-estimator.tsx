@@ -32,6 +32,7 @@ export function TokenEstimator() {
         <Textarea
           id="token-lab-input"
           rows={5}
+          className="max-h-64"
           placeholder={t('placeholder')}
           value={text}
           onChange={(event) => setText(event.target.value)}
