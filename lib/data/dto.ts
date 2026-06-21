@@ -38,6 +38,16 @@ export type TextToSqlBenchmarkDTO = {
   source: PricingSourceDTO | null;
 };
 
+export type RagRetrievalBenchmarkDTO = {
+  benchmark: string;
+  provider: string;
+  model: string;
+  metricType: string;
+  metricValue: string;
+  notes: string | null;
+  source: PricingSourceDTO | null;
+};
+
 export type PricingCatalogDTO = {
   id: string;
   snapshotId: string;

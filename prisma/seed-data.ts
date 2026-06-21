@@ -68,6 +68,19 @@ export type BenchmarkEntry = {
   notes?: string;
 };
 
+// A cited RAG retrieval-quality benchmark (e.g. MTEB) for an embedding model.
+// The model name matches the pricing catalog so the RAG lab can attach the score
+// to the embedding the user selected. It is informational and never alters cost.
+export type RetrievalBenchmarkEntry = {
+  sourceKey: string;
+  benchmark: string;
+  provider: string;
+  model: string;
+  metricType: string;
+  metricValue: string;
+  notes?: string;
+};
+
 // Date every price row was retrieved from its official source.
 export const RETRIEVED_AT = '2026-06-14';
 
@@ -188,6 +201,17 @@ export const citedSources: CitedSource[] = [
     notes:
       'Spider dev execution accuracy, GPT-4 baseline packing the full schema into the prompt. Raw Text-to-SQL with no semantic layer.',
   },
+  {
+    key: 'mteb-leaderboard',
+    sourceType: 'third_party_benchmark',
+    title: 'Embedding Model Leaderboard: MTEB Rankings April 2026',
+    url: 'https://awesomeagents.ai/leaderboards/embedding-model-leaderboard-mteb-april-2026/',
+    provider: 'MTEB',
+    sourceDate: '2026-04-01',
+    retrievedAt: BENCHMARK_RETRIEVED_AT,
+    notes:
+      'MTEB English overall mean across 56 datasets / 8 task categories. Higher is better; retrieval is one of the categories.',
+  },
 ];
 
 // Text-to-SQL accuracy benchmarks. Accuracy is reported per model with and
@@ -293,6 +317,37 @@ export const textToSqlBenchmarks: BenchmarkEntry[] = [
     metricType: 'execution_accuracy',
     isOfficial: false,
     baselineAccuracy: '70.0',
+  },
+];
+
+// RAG retrieval-quality benchmarks (MTEB). Model names match the pricing catalog
+// so the score attaches to the embedding the user picks. mistral-embed is absent
+// from this leaderboard, so it simply shows no benchmark.
+export const ragRetrievalBenchmarks: RetrievalBenchmarkEntry[] = [
+  {
+    sourceKey: 'mteb-leaderboard',
+    benchmark: 'MTEB v2 · English',
+    provider: 'OpenAI',
+    model: 'text-embedding-3-small',
+    metricType: 'mteb_mean',
+    metricValue: '62.26',
+  },
+  {
+    sourceKey: 'mteb-leaderboard',
+    benchmark: 'MTEB v2 · English',
+    provider: 'OpenAI',
+    model: 'text-embedding-3-large',
+    metricType: 'mteb_mean',
+    metricValue: '64.6',
+  },
+  {
+    sourceKey: 'mteb-leaderboard',
+    benchmark: 'MTEB v2 · English',
+    provider: 'Google',
+    model: 'gemini-embedding',
+    metricType: 'mteb_mean',
+    metricValue: '68.32',
+    notes: 'Reported as gemini-embedding-001; retrieval (nDCG@10) sub-score 67.71.',
   },
 ];
 

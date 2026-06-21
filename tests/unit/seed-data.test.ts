@@ -5,6 +5,7 @@ import {
   citedSources,
   pricingCatalog,
   pricingSnapshot,
+  ragRetrievalBenchmarks,
   textToSqlBenchmarks,
 } from '../../prisma/seed-data';
 
@@ -136,5 +137,25 @@ describe('cited text-to-sql benchmarks', () => {
     );
 
     expect(new Set(keys).size).toBe(keys.length);
+  });
+});
+
+describe('cited RAG retrieval benchmarks', () => {
+  it('seeds retrieval-quality scores', () => {
+    expect(ragRetrievalBenchmarks.length).toBeGreaterThan(0);
+  });
+
+  it('links every retrieval benchmark to a citable source with an in-range score', () => {
+    for (const entry of ragRetrievalBenchmarks) {
+      const source = sourcesByKey.get(entry.sourceKey);
+
+      expect(source, `${entry.model} has a known source`).toBeDefined();
+      expect(source?.url).toMatch(/^https:\/\//);
+      expect(source?.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+      const score = Number(entry.metricValue);
+      expect(score).toBeGreaterThan(0);
+      expect(score).toBeLessThanOrEqual(100);
+    }
   });
 });

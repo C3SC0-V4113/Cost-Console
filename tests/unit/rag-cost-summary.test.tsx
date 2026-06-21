@@ -7,6 +7,7 @@ import { computeRagCost } from '@/lib/calc/rag-cost';
 import esMessages from '@/messages/es.json';
 
 import type { RagCostInput, RagCostPricing } from '@/lib/calc/rag-cost';
+import type { RagRetrievalBenchmarkDTO } from '@/lib/data/dto';
 
 const pricing: RagCostPricing = {
   currency: 'USD',
@@ -77,6 +78,34 @@ describe('RagCostSummary', () => {
     renderSummary();
 
     expect(screen.getByText('No disponible (sin precio citado)')).toBeTruthy();
+  });
+
+  it('shows the cited retrieval-quality score for the embedding model', () => {
+    const retrieval: RagRetrievalBenchmarkDTO = {
+      benchmark: 'MTEB v2 · English',
+      provider: 'OpenAI',
+      model: 'text-embedding-3-large',
+      metricType: 'mteb_mean',
+      metricValue: '64.6',
+      notes: null,
+      source: {
+        title: 'MTEB leaderboard',
+        url: 'https://awesomeagents.ai/leaderboards/embedding-model-leaderboard-mteb-april-2026/',
+        sourceType: 'third_party_benchmark',
+        sourceDate: '2026-04-01',
+        retrievedAt: '2026-06-19T00:00:00.000Z',
+      },
+    };
+    render(
+      <NextIntlClientProvider locale="es" messages={esMessages} timeZone="UTC">
+        <RagCostSummary result={computeRagCost(input, pricing)} retrieval={retrieval} />
+      </NextIntlClientProvider>
+    );
+
+    expect(screen.getByText('Calidad de recuperación (MTEB)')).toBeTruthy();
+    expect(screen.getByText('64,6')).toBeTruthy();
+    // Cited via the SourceTag affordance (third-party benchmark).
+    expect(screen.getByText('Benchmark de terceros')).toBeTruthy();
   });
 
   it('renders a placeholder when there is no result', () => {

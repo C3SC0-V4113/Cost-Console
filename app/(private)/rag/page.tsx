@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { RagCostCalculator } from '@/components/rag/rag-cost-calculator';
 import { DEFAULT_RAG_INPUTS } from '@/components/rag/rag-inputs';
 import { computeRagCost } from '@/lib/calc/rag-cost';
+import { listRagRetrievalBenchmarks } from '@/lib/data/benchmark-repository';
 import { getActiveSnapshot, listCatalog } from '@/lib/data/pricing-repository';
 
 import type { RagModelOption } from '@/components/rag/rag-cost-calculator';
@@ -16,7 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RagCostPage() {
-  const [t, snapshot] = await Promise.all([getTranslations('rag'), getActiveSnapshot()]);
+  const [t, snapshot, retrievalBenchmarks] = await Promise.all([
+    getTranslations('rag'),
+    getActiveSnapshot(),
+    listRagRetrievalBenchmarks(),
+  ]);
   const catalog = snapshot ? await listCatalog(snapshot.id) : [];
 
   const embeddingRows = catalog.filter(
@@ -26,10 +31,13 @@ export default async function RagCostPage() {
     (row) => row.capability === 'chat' && row.inputPrice && row.outputPrice
   );
 
+  // Attach each embedding model's cited retrieval-quality score by model name.
+  const retrievalByModel = new Map(retrievalBenchmarks.map((entry) => [entry.model, entry]));
   const embeddingModels: RagModelOption[] = embeddingRows.map((row) => ({
     id: row.id,
     provider: row.provider,
     model: row.model,
+    retrieval: retrievalByModel.get(row.model) ?? null,
   }));
   const generationModels: RagModelOption[] = chatRows.map((row) => ({
     id: row.id,

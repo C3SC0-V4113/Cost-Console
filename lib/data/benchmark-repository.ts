@@ -2,7 +2,7 @@ import 'server-only';
 
 import { prisma } from '@/lib/prisma';
 
-import type { PricingSourceDTO, TextToSqlBenchmarkDTO } from './dto';
+import type { PricingSourceDTO, RagRetrievalBenchmarkDTO, TextToSqlBenchmarkDTO } from './dto';
 
 // Structural row shape the mapper reads, kept independent of generated Prisma
 // types so the pairing logic stays pure and testable.
@@ -94,4 +94,34 @@ export async function listTextToSqlBenchmarks(): Promise<TextToSqlBenchmarkDTO[]
     orderBy: [{ datasetOrScenario: 'asc' }, { provider: 'asc' }, { model: 'asc' }],
   });
   return toTextToSqlBenchmarks(rows);
+}
+
+// One cited retrieval-quality score per embedding model (MTEB). Keyed by model
+// name so the RAG lab can attach it to the selected embedding.
+export function toRagRetrievalBenchmarks(rows: BenchmarkRow[]): RagRetrievalBenchmarkDTO[] {
+  const benchmarks: RagRetrievalBenchmarkDTO[] = [];
+  for (const row of rows) {
+    if (!row.provider || !row.model || !row.datasetOrScenario) {
+      continue;
+    }
+    benchmarks.push({
+      benchmark: row.datasetOrScenario,
+      provider: row.provider,
+      model: row.model,
+      metricType: row.metricType,
+      metricValue: row.metricValue.toString(),
+      notes: row.notes,
+      source: toSourceDTO(row.sourceReference),
+    });
+  }
+  return benchmarks;
+}
+
+export async function listRagRetrievalBenchmarks(): Promise<RagRetrievalBenchmarkDTO[]> {
+  const rows = await prisma.benchmarkResult.findMany({
+    where: { benchmarkKind: 'rag_retrieval' },
+    include: { sourceReference: true },
+    orderBy: [{ provider: 'asc' }, { model: 'asc' }],
+  });
+  return toRagRetrievalBenchmarks(rows);
 }

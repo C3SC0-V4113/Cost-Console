@@ -382,6 +382,7 @@
       "selectModel": "Select embedding and generation models to estimate RAG cost.",
       "oneTimeIngestion": "One-time ingestion",
       "ingestionDetail": "{chunks} chunks · {tokens} embedding tokens",
+      "retrievalQuality": "Retrieval quality (MTEB)",
       "perQuery": "Per query",
       "perDay": "Per day",
       "perMonth": "Per month",

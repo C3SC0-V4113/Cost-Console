@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { toTextToSqlBenchmarks } from '@/lib/data/benchmark-repository';
+import { toRagRetrievalBenchmarks, toTextToSqlBenchmarks } from '@/lib/data/benchmark-repository';
 
 type Row = Parameters<typeof toTextToSqlBenchmarks>[0][number];
 
@@ -94,5 +94,34 @@ describe('toTextToSqlBenchmarks', () => {
     ]);
 
     expect(scenarios).toHaveLength(0);
+  });
+});
+
+describe('toRagRetrievalBenchmarks', () => {
+  it('maps each rag_retrieval row to a per-model DTO with its source', () => {
+    const benchmarks = toRagRetrievalBenchmarks([
+      row({
+        benchmarkKind: 'rag_retrieval',
+        datasetOrScenario: 'MTEB v2 · English',
+        provider: 'OpenAI',
+        model: 'text-embedding-3-large',
+        metricType: 'mteb_mean',
+        metricValue: '64.6',
+      }),
+    ]);
+
+    expect(benchmarks).toHaveLength(1);
+    expect(benchmarks[0]).toMatchObject({
+      benchmark: 'MTEB v2 · English',
+      model: 'text-embedding-3-large',
+      metricValue: '64.6',
+    });
+    expect(benchmarks[0]?.source?.url).toMatch(/^https:\/\//);
+  });
+
+  it('skips rows missing a provider, model, or dataset', () => {
+    expect(
+      toRagRetrievalBenchmarks([row({ benchmarkKind: 'rag_retrieval', model: null })])
+    ).toHaveLength(0);
   });
 });

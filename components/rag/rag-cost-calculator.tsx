@@ -15,8 +15,15 @@ import { DEFAULT_RAG_INPUTS } from './rag-inputs';
 
 import type { RagCalculatorInputs } from './rag-inputs';
 import type { RagCostResult } from '@/lib/calc/rag-cost';
+import type { RagRetrievalBenchmarkDTO } from '@/lib/data/dto';
 
-export type RagModelOption = { id: string; provider: string; model: string };
+export type RagModelOption = {
+  id: string;
+  provider: string;
+  model: string;
+  // A cited MTEB retrieval score, attached to embedding models that have one.
+  retrieval?: RagRetrievalBenchmarkDTO | null;
+};
 
 const RECOMPUTE_DEBOUNCE_MS = 250;
 const MAX_DAYS_PER_MONTH = 31;
@@ -61,6 +68,9 @@ export function RagCostCalculator({
   }
 
   const isCacheAvailable = result?.cacheAvailable ?? true;
+  const retrieval =
+    embeddingModels.find((option) => option.id === inputs.ingestionEmbeddingModel)?.retrieval ??
+    null;
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
@@ -242,7 +252,7 @@ export function RagCostCalculator({
             <span className="text-xs text-muted-foreground">{tr('calculating')}</span>
           ) : null}
         </div>
-        <RagCostSummary result={result} />
+        <RagCostSummary result={result} retrieval={retrieval} />
       </div>
     </div>
   );

@@ -2,9 +2,11 @@
 
 import { useFormatter, useTranslations } from 'next-intl';
 
+import { SourceTag } from '@/components/help/source-tag';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
 import type { RagCostResult } from '@/lib/calc/rag-cost';
+import type { RagRetrievalBenchmarkDTO } from '@/lib/data/dto';
 
 function Assumption({ label, value }: Readonly<{ label: string; value: string }>) {
   return (
@@ -15,7 +17,13 @@ function Assumption({ label, value }: Readonly<{ label: string; value: string }>
   );
 }
 
-export function RagCostSummary({ result }: Readonly<{ result: RagCostResult | null }>) {
+export function RagCostSummary({
+  result,
+  retrieval = null,
+}: Readonly<{
+  result: RagCostResult | null;
+  retrieval?: RagRetrievalBenchmarkDTO | null;
+}>) {
   const t = useTranslations('rag');
   const tItems = useTranslations('costSummary');
   const format = useFormatter();
@@ -59,6 +67,24 @@ export function RagCostSummary({ result }: Readonly<{ result: RagCostResult | nu
           })}
         </p>
       </div>
+
+      {/* Cited retrieval-quality score for the selected embedding model (MTEB). */}
+      {retrieval ? (
+        <div className="grid gap-1.5 rounded-xl border border-border px-4 py-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">{t('summary.retrievalQuality')}</span>
+            <span className="font-semibold text-foreground tabular-nums">
+              {format.number(Number(retrieval.metricValue))}
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-muted-foreground">
+              {retrieval.benchmark} · {retrieval.provider} {retrieval.model}
+            </span>
+            <SourceTag source={retrieval.source} />
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3">
         {recurringRollups.map((rollup) => (
