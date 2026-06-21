@@ -51,10 +51,11 @@ export type SnapshotSeed = {
   notes: string;
 };
 
-// A paired Text-to-SQL accuracy benchmark: one cited study reports a model's
-// accuracy both without a semantic layer (baseline) and with it. Each entry
-// expands to two `benchmark_result` rows (text_to_sql_accuracy and
-// semantic_layer_accuracy) so accuracy is a source-backed result, never a guess.
+// A cited Text-to-SQL accuracy benchmark. A paired study reports a model's
+// accuracy both without a semantic layer (baseline) and with it; a raw-only
+// benchmark (e.g. BIRD, Spider) reports just the baseline and omits
+// `semanticAccuracy`. Each entry expands to one `benchmark_result` row per
+// reported metric so accuracy is a source-backed result, never a guess.
 export type BenchmarkEntry = {
   sourceKey: string;
   benchmark: string;
@@ -63,7 +64,7 @@ export type BenchmarkEntry = {
   metricType: string;
   isOfficial: boolean;
   baselineAccuracy: string;
-  semanticAccuracy: string;
+  semanticAccuracy?: string;
   notes?: string;
 };
 
@@ -166,6 +167,27 @@ export const citedSources: CitedSource[] = [
     notes:
       'Cube vendor benchmark on the Contoso Retail (ClickHouse) dataset, 100 questions. Cube is a headless semantic layer.',
   },
+  {
+    key: 'bird-benchmark',
+    sourceType: 'third_party_benchmark',
+    title: 'Evaluating LLMs for Text-to-SQL with PremSQL',
+    url: 'https://blog.premai.io/evaluating-llms-for-text-to-sql-with-premsql/',
+    provider: 'Prem AI',
+    retrievedAt: BENCHMARK_RETRIEVED_AT,
+    notes:
+      'Third-party evaluation on a 300-sample BIRD dev subset, execution accuracy. Raw Text-to-SQL with no semantic layer.',
+  },
+  {
+    key: 'spider-benchmark',
+    sourceType: 'third_party_benchmark',
+    title: 'Text-to-SQL Empowered by Large Language Models: A Benchmark Evaluation (DAIL-SQL)',
+    url: 'https://arxiv.org/abs/2308.15363',
+    provider: 'Gao et al.',
+    sourceDate: '2023-08-29',
+    retrievedAt: BENCHMARK_RETRIEVED_AT,
+    notes:
+      'Spider dev execution accuracy, GPT-4 baseline packing the full schema into the prompt. Raw Text-to-SQL with no semantic layer.',
+  },
 ];
 
 // Text-to-SQL accuracy benchmarks. Accuracy is reported per model with and
@@ -224,6 +246,53 @@ export const textToSqlBenchmarks: BenchmarkEntry[] = [
     isOfficial: false,
     baselineAccuracy: '45.5',
     semanticAccuracy: '68.7',
+  },
+  // BIRD — raw Text-to-SQL reference (no semantic layer), third-party eval.
+  {
+    sourceKey: 'bird-benchmark',
+    benchmark: 'BIRD · dev subset',
+    provider: 'Meta',
+    model: 'Llama 3.1 405B',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '45.66',
+  },
+  {
+    sourceKey: 'bird-benchmark',
+    benchmark: 'BIRD · dev subset',
+    provider: 'OpenAI',
+    model: 'GPT-4o',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '44.0',
+  },
+  {
+    sourceKey: 'bird-benchmark',
+    benchmark: 'BIRD · dev subset',
+    provider: 'OpenAI',
+    model: 'GPT-4o mini',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '34.63',
+  },
+  {
+    sourceKey: 'bird-benchmark',
+    benchmark: 'BIRD · dev subset',
+    provider: 'Anthropic',
+    model: 'Claude 3.5 Sonnet',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '33.33',
+  },
+  // Spider — raw Text-to-SQL reference (no semantic layer).
+  {
+    sourceKey: 'spider-benchmark',
+    benchmark: 'Spider · dev',
+    provider: 'OpenAI',
+    model: 'GPT-4 (full schema)',
+    metricType: 'execution_accuracy',
+    isOfficial: false,
+    baselineAccuracy: '70.0',
   },
 ];
 

@@ -13,6 +13,11 @@ export type TextToSqlCalculatorInputs = {
   model: string;
   benchmarkId: string;
   includeRetry: boolean;
+  // Manual accuracy override (ADR 0004): adjusts the selected benchmark's
+  // figures for a domain it does not match, kept visually distinct.
+  overrideAccuracy: boolean;
+  overrideBaselineAccuracy: number;
+  overrideSemanticAccuracy: number;
   questionsPerDay: number;
   daysPerMonth: number;
   questionTokens: number;
@@ -24,9 +29,24 @@ export type TextToSqlCalculatorInputs = {
   promptCacheHitPercentage: number;
 };
 
+// The manual-override fields pre-fill from the benchmark so adjusting starts
+// from the cited figures rather than zero.
+export function overrideDefaults(
+  benchmark: { baselineAccuracy: string; semanticAccuracy: string | null } | null
+): Pick<TextToSqlCalculatorInputs, 'overrideBaselineAccuracy' | 'overrideSemanticAccuracy'> {
+  return {
+    overrideBaselineAccuracy: benchmark ? Number(benchmark.baselineAccuracy) : 0,
+    overrideSemanticAccuracy:
+      benchmark?.semanticAccuracy != null ? Number(benchmark.semanticAccuracy) : 0,
+  };
+}
+
 export const DEFAULT_TEXT_TO_SQL_INPUTS: Omit<TextToSqlCalculatorInputs, 'model' | 'benchmarkId'> =
   {
     includeRetry: false,
+    overrideAccuracy: false,
+    overrideBaselineAccuracy: 0,
+    overrideSemanticAccuracy: 0,
     questionsPerDay: 200,
     daysPerMonth: 30,
     questionTokens: 40,

@@ -78,8 +78,9 @@ export type TextToSqlScenario = {
 
 export type TextToSqlAccuracySummary = {
   baselinePercentage: number;
-  semanticPercentage: number;
-  deltaPercentage: number;
+  // Null for raw-only benchmarks that report no semantic-layer figure.
+  semanticPercentage: number | null;
+  deltaPercentage: number | null;
 };
 
 export type TextToSqlCostResult = {
@@ -264,17 +265,21 @@ export function computeTextToSqlCost(
     }
   }
 
+  // Accuracy exists whenever a benchmark provides a baseline. The semantic
+  // figure and the delta are only present for paired benchmarks.
   const accuracy: TextToSqlAccuracySummary | null =
-    input.baselineAccuracyPercentage !== null && input.semanticAccuracyPercentage !== null
+    input.baselineAccuracyPercentage !== null
       ? {
           baselinePercentage: input.baselineAccuracyPercentage,
           semanticPercentage: input.semanticAccuracyPercentage,
-          // Round to the benchmark's 4-decimal scale so float subtraction does
-          // not leak noise like 8.200000000000003 into the UI.
           deltaPercentage:
-            Math.round(
-              (input.semanticAccuracyPercentage - input.baselineAccuracyPercentage) * 1e4
-            ) / 1e4,
+            input.semanticAccuracyPercentage !== null
+              ? // Round to the benchmark's 4-decimal scale so float subtraction
+                // does not leak noise like 8.200000000000003 into the UI.
+                Math.round(
+                  (input.semanticAccuracyPercentage - input.baselineAccuracyPercentage) * 1e4
+                ) / 1e4
+              : null,
         }
       : null;
 

@@ -3,6 +3,7 @@
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { SourceTag } from '@/components/help/source-tag';
+import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useCurrencyFormat } from '@/hooks/use-currency-format';
 
@@ -25,7 +26,12 @@ function Assumption({ label, value }: Readonly<{ label: string; value: string }>
 export function TextToSqlCostSummary({
   result,
   benchmark,
-}: Readonly<{ result: TextToSqlCostResult | null; benchmark: TextToSqlBenchmarkDTO | null }>) {
+  overridden = false,
+}: Readonly<{
+  result: TextToSqlCostResult | null;
+  benchmark: TextToSqlBenchmarkDTO | null;
+  overridden?: boolean;
+}>) {
   const t = useTranslations('textToSql');
   const format = useFormatter();
   const formatCurrency = useCurrencyFormat(result?.currency ?? 'USD');
@@ -78,43 +84,61 @@ export function TextToSqlCostSummary({
         </div>
       </div>
 
-      {/* Accuracy is a source-backed result; the source sits on its own line. */}
+      {/* Accuracy is a source-backed result; the source sits on its own line.
+          A raw-only benchmark shows just the baseline; an override marks the
+          figures as manually adjusted, visually distinct from the cited value. */}
       {accuracy && benchmark ? (
         <div className="grid gap-3 rounded-xl border border-border bg-muted p-4">
-          <div className="grid grid-cols-3 gap-3 text-sm">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
             <div className="grid gap-0.5">
               <span className="text-xs text-muted-foreground">{t('summary.baselineAccuracy')}</span>
               <span className="font-semibold text-foreground tabular-nums">
                 {accuracy.baselinePercentage}%
               </span>
             </div>
-            <div className="grid gap-0.5">
-              <span className="text-xs text-muted-foreground">{t('summary.semanticAccuracy')}</span>
-              <span className="font-semibold text-foreground tabular-nums">
-                {accuracy.semanticPercentage}%
+            {accuracy.semanticPercentage !== null ? (
+              <div className="grid gap-0.5">
+                <span className="text-xs text-muted-foreground">
+                  {t('summary.semanticAccuracy')}
+                </span>
+                <span className="font-semibold text-foreground tabular-nums">
+                  {accuracy.semanticPercentage}%
+                </span>
+              </div>
+            ) : null}
+            {accuracy.deltaPercentage !== null ? (
+              <div className="grid gap-0.5">
+                <span className="text-xs text-muted-foreground">{t('summary.accuracyDelta')}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="w-fit cursor-help font-semibold text-foreground tabular-nums underline decoration-muted-foreground/60 decoration-dotted underline-offset-4">
+                      {signed(Number(accuracy.deltaPercentage.toFixed(1)))}%
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>{signed(accuracy.deltaPercentage)}%</TooltipContent>
+                </Tooltip>
+              </div>
+            ) : null}
+          </div>
+          {overridden ? (
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <Badge variant="outline">{t('summary.manualOverride')}</Badge>
+              <span className="text-muted-foreground">
+                {t('summary.basedOn')} {benchmark.benchmark} · {benchmark.provider}{' '}
+                {benchmark.model}
               </span>
             </div>
-            <div className="grid gap-0.5">
-              <span className="text-xs text-muted-foreground">{t('summary.accuracyDelta')}</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="w-fit cursor-help font-semibold text-foreground tabular-nums underline decoration-muted-foreground/60 decoration-dotted underline-offset-4">
-                    {signed(Number(accuracy.deltaPercentage.toFixed(1)))}%
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>{signed(accuracy.deltaPercentage)}%</TooltipContent>
-              </Tooltip>
+          ) : (
+            <div className="grid gap-1.5 text-xs">
+              <span className="text-muted-foreground">
+                {t('summary.accuracySource')} {benchmark.benchmark} · {benchmark.provider}{' '}
+                {benchmark.model}
+              </span>
+              <div>
+                <SourceTag source={benchmark.source} />
+              </div>
             </div>
-          </div>
-          <div className="grid gap-1.5 text-xs">
-            <span className="text-muted-foreground">
-              {t('summary.accuracySource')} {benchmark.benchmark} · {benchmark.provider}{' '}
-              {benchmark.model}
-            </span>
-            <div>
-              <SourceTag source={benchmark.source} />
-            </div>
-          </div>
+          )}
         </div>
       ) : null}
 

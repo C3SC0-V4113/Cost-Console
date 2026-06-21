@@ -102,19 +102,32 @@ describe('cited text-to-sql benchmarks', () => {
       expect(source, `${entry.benchmark}/${entry.model} has a known source`).toBeDefined();
       expect(source?.url).toMatch(/^https:\/\//);
       expect(source?.retrievedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(source?.sourceType).toBe('vendor_benchmark');
+      expect(['vendor_benchmark', 'third_party_benchmark']).toContain(source?.sourceType);
     }
   });
 
-  it('reports baseline and semantic accuracy as in-range percentages, semantic >= baseline', () => {
+  it('reports baseline accuracy as an in-range percentage', () => {
     for (const entry of textToSqlBenchmarks) {
       const baseline = Number(entry.baselineAccuracy);
-      const semantic = Number(entry.semanticAccuracy);
-
       expect(baseline).toBeGreaterThanOrEqual(0);
-      expect(semantic).toBeLessThanOrEqual(100);
-      expect(semantic).toBeGreaterThanOrEqual(baseline);
+      expect(baseline).toBeLessThanOrEqual(100);
     }
+  });
+
+  it('keeps paired semantic accuracy in range and not below baseline', () => {
+    // Raw-only benchmarks (BIRD, Spider) report no semantic-layer figure.
+    const paired = textToSqlBenchmarks.filter((entry) => entry.semanticAccuracy !== undefined);
+    expect(paired.length).toBeGreaterThan(0);
+
+    for (const entry of paired) {
+      const semantic = Number(entry.semanticAccuracy);
+      expect(semantic).toBeLessThanOrEqual(100);
+      expect(semantic).toBeGreaterThanOrEqual(Number(entry.baselineAccuracy));
+    }
+  });
+
+  it('includes at least one raw-only benchmark (no semantic-layer figure)', () => {
+    expect(textToSqlBenchmarks.some((entry) => entry.semanticAccuracy === undefined)).toBe(true);
   });
 
   it('has no duplicate benchmark/provider/model rows', () => {

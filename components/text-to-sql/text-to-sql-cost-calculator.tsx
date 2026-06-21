@@ -7,21 +7,16 @@ import { calculateTextToSqlCost } from '@/app/(private)/text-to-sql/actions';
 import { ModelSelect, NumberField, Section } from '@/components/calc/calculator-fields';
 import { HelpTip } from '@/components/help/help-tip';
 import { TokenLab } from '@/components/help/token-lab';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 
+import { TextToSqlBenchmarkSection } from './text-to-sql-benchmark-section';
 import { TextToSqlCostSummary } from './text-to-sql-cost-summary';
-import { DEFAULT_TEXT_TO_SQL_INPUTS, NO_BENCHMARK_ID } from './text-to-sql-inputs';
+import {
+  DEFAULT_TEXT_TO_SQL_INPUTS,
+  NO_BENCHMARK_ID,
+  overrideDefaults,
+} from './text-to-sql-inputs';
 
 import type { TextToSqlCalculatorInputs } from './text-to-sql-inputs';
 import type { TextToSqlCostResult } from '@/lib/calc/text-to-sql-cost';
@@ -32,18 +27,6 @@ export type TextToSqlModelOption = { id: string; provider: string; model: string
 const RECOMPUTE_DEBOUNCE_MS = 250;
 const MAX_DAYS_PER_MONTH = 31;
 const SEMANTIC_MODE_KEYS = ['none', 'headless', 'native'] as const;
-
-// Group benchmark scenarios by their dataset so the select reads as one entry
-// per benchmark, with the model options nested under it.
-function groupBenchmarks(benchmarks: TextToSqlBenchmarkDTO[]): [string, TextToSqlBenchmarkDTO[]][] {
-  const groups = new Map<string, TextToSqlBenchmarkDTO[]>();
-  for (const entry of benchmarks) {
-    const list = groups.get(entry.benchmark) ?? [];
-    list.push(entry);
-    groups.set(entry.benchmark, list);
-  }
-  return [...groups];
-}
 
 export function TextToSqlCostCalculator({
   models,
@@ -62,6 +45,7 @@ export function TextToSqlCostCalculator({
     model: models[0]?.id ?? '',
     benchmarkId: benchmarks[0]?.id ?? NO_BENCHMARK_ID,
     ...DEFAULT_TEXT_TO_SQL_INPUTS,
+    ...overrideDefaults(defaultBenchmark),
   }));
   const [result, setResult] = useState<TextToSqlCostResult | null>(defaultResult);
   const [benchmark, setBenchmark] = useState<TextToSqlBenchmarkDTO | null>(defaultBenchmark);
@@ -93,6 +77,10 @@ export function TextToSqlCostCalculator({
 
   const isCacheAvailable = result?.cacheAvailable ?? true;
   const hasBenchmark = inputs.benchmarkId !== NO_BENCHMARK_ID;
+  const selectedBenchmark = benchmarks.find((entry) => entry.id === inputs.benchmarkId) ?? null;
+  // A paired benchmark (dbt, Cube) reports a semantic-layer figure; raw-only
+  // ones (BIRD, Spider) do not, so the semantic scenario stays unavailable.
+  const isPaired = selectedBenchmark?.semanticAccuracy != null;
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
@@ -108,62 +96,13 @@ export function TextToSqlCostCalculator({
           />
         </Section>
 
-        <Section
-          title={tt('sectionBenchmark')}
-          help={<HelpTip label={t('accuracy.label')}>{t('accuracy.body')}</HelpTip>}
-        >
-          <div className="grid gap-1.5">
-            <Label htmlFor="text-to-sql-benchmark">{tt('benchmarkLabel')}</Label>
-            <Select
-              value={inputs.benchmarkId}
-              onValueChange={(value) =>
-                update({
-                  benchmarkId: value,
-                  // Retry only applies with a semantic-layer benchmark.
-                  includeRetry: value === NO_BENCHMARK_ID ? false : inputs.includeRetry,
-                })
-              }
-            >
-              <SelectTrigger id="text-to-sql-benchmark">
-                <SelectValue placeholder={tt('benchmarkPlaceholder')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value={NO_BENCHMARK_ID}>{tt('noBenchmark')}</SelectItem>
-                </SelectGroup>
-                {groupBenchmarks(benchmarks).map(([name, entries]) => (
-                  <SelectGroup key={name}>
-                    <SelectLabel>{name}</SelectLabel>
-                    {entries.map((entry) => (
-                      <SelectItem key={entry.id} value={entry.id}>
-                        {entry.provider} · {entry.model}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-muted-foreground">
-              {hasBenchmark ? tt('benchmarkNote') : tt('noBenchmarkNote')}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="text-to-sql-retry"
-              checked={inputs.includeRetry}
-              disabled={!hasBenchmark}
-              onCheckedChange={(checked) => update({ includeRetry: checked === true })}
-            />
-            <Label
-              htmlFor="text-to-sql-retry"
-              className={!hasBenchmark ? 'text-muted-foreground' : undefined}
-            >
-              {tt('includeRetry')}
-            </Label>
-            <HelpTip label={t('validationLoop.label')}>{t('validationLoop.body')}</HelpTip>
-          </div>
-        </Section>
+        <TextToSqlBenchmarkSection
+          benchmarks={benchmarks}
+          inputs={inputs}
+          update={update}
+          hasBenchmark={hasBenchmark}
+          isPaired={isPaired}
+        />
 
         <Section title={tt('sectionSchema')}>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -190,7 +129,7 @@ export function TextToSqlCostCalculator({
               id="validation-prompt-tokens"
               label={tt('validationPromptTokens')}
               value={inputs.validationPromptTokens}
-              disabled={!hasBenchmark || !inputs.includeRetry}
+              disabled={!isPaired || !inputs.includeRetry}
               onChange={(value) => update({ validationPromptTokens: value })}
               help={<HelpTip label={t('validationLoop.label')}>{t('validationLoop.body')}</HelpTip>}
             />
@@ -202,14 +141,14 @@ export function TextToSqlCostCalculator({
           title={tt('sectionSemantic')}
           help={<HelpTip label={t('semanticLayer.label')}>{t('semanticLayer.body')}</HelpTip>}
         >
-          {hasBenchmark ? null : (
+          {isPaired ? null : (
             <p className="text-sm text-muted-foreground">{tt('semanticDisabled')}</p>
           )}
           <NumberField
             id="semantic-metadata-tokens"
             label={tt('semanticMetadataTokens')}
             value={inputs.semanticMetadataTokens}
-            disabled={!hasBenchmark}
+            disabled={!isPaired}
             onChange={(value) => update({ semanticMetadataTokens: value })}
           />
           <dl className="grid gap-2 rounded-xl border border-border bg-muted/40 p-3 text-xs">
@@ -252,7 +191,7 @@ export function TextToSqlCostCalculator({
               id="max-repair-attempts"
               label={tt('maxRepairAttempts')}
               value={inputs.maxRepairAttempts}
-              disabled={!hasBenchmark || !inputs.includeRetry}
+              disabled={!isPaired || !inputs.includeRetry}
               onChange={(value) => update({ maxRepairAttempts: value })}
               help={<HelpTip label={t('validationLoop.label')}>{t('validationLoop.body')}</HelpTip>}
             />
@@ -295,7 +234,11 @@ export function TextToSqlCostCalculator({
             <span className="text-xs text-muted-foreground">{tt('calculating')}</span>
           ) : null}
         </div>
-        <TextToSqlCostSummary result={result} benchmark={benchmark} />
+        <TextToSqlCostSummary
+          result={result}
+          benchmark={benchmark}
+          overridden={inputs.overrideAccuracy}
+        />
       </div>
     </div>
   );

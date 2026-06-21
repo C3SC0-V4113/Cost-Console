@@ -31,7 +31,9 @@ export type TextToSqlBenchmarkDTO = {
   metricType: string;
   isOfficial: boolean;
   baselineAccuracy: string;
-  semanticAccuracy: string;
+  // Null for raw-only benchmarks (e.g. BIRD, Spider) that report no
+  // semantic-layer figure.
+  semanticAccuracy: string | null;
   notes: string | null;
   source: PricingSourceDTO | null;
 };

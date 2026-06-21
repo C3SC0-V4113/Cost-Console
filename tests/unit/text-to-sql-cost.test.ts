@@ -110,6 +110,21 @@ describe('computeTextToSqlCost — conditional scenarios', () => {
     expect(result.scenarios.map((s) => s.key)).toEqual(['raw', 'semantic']);
     expect(result.accuracy).not.toBeNull();
   });
+
+  it('shows baseline-only accuracy for a raw-only benchmark', () => {
+    const result = computeTextToSqlCost(
+      { ...input, includeSemantic: false, includeRetry: false, semanticAccuracyPercentage: null },
+      pricing
+    );
+
+    expect(result.scenarios.map((s) => s.key)).toEqual(['raw']);
+    expect(result.accuracy).toEqual({
+      baselinePercentage: 60,
+      semanticPercentage: null,
+      deltaPercentage: null,
+    });
+    expect(scenario(result, 'raw')?.accuracyPercentage).toBe(60);
+  });
 });
 
 describe('computeTextToSqlCost — caching and warehouse', () => {

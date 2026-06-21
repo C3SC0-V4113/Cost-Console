@@ -120,6 +120,49 @@ describe('TextToSqlCostSummary', () => {
     expect(screen.queryByText('+25%')).toBeNull();
   });
 
+  it('shows baseline-only accuracy and no semantic scenario for a raw-only benchmark', () => {
+    const rawResult = computeTextToSqlCost(
+      { ...input, includeSemantic: false, includeRetry: false, semanticAccuracyPercentage: null },
+      pricing
+    );
+    const rawBenchmark: TextToSqlBenchmarkDTO = {
+      ...benchmark,
+      id: 'BIRD · dev subset::OpenAI::GPT-4o',
+      benchmark: 'BIRD · dev subset',
+      model: 'GPT-4o',
+      semanticAccuracy: null,
+    };
+    render(
+      <NextIntlClientProvider locale="es" messages={esMessages} timeZone="UTC">
+        <TooltipProvider>
+          <TextToSqlCostSummary result={rawResult} benchmark={rawBenchmark} />
+        </TooltipProvider>
+      </NextIntlClientProvider>
+    );
+
+    expect(screen.queryByText('Con capa semántica')).toBeNull();
+    expect(screen.queryByText('+25%')).toBeNull();
+    // Still cited (raw-only is source-backed).
+    expect(screen.getByText('Benchmark del proveedor')).toBeTruthy();
+  });
+
+  it('marks accuracy as manually overridden, hiding the cited source tag', () => {
+    render(
+      <NextIntlClientProvider locale="es" messages={esMessages} timeZone="UTC">
+        <TooltipProvider>
+          <TextToSqlCostSummary
+            result={computeTextToSqlCost(input, pricing)}
+            benchmark={benchmark}
+            overridden
+          />
+        </TooltipProvider>
+      </NextIntlClientProvider>
+    );
+
+    expect(screen.getByText('Ajuste manual')).toBeTruthy();
+    expect(screen.queryByText('Benchmark del proveedor')).toBeNull();
+  });
+
   it('renders a placeholder when there is no result', () => {
     render(
       <NextIntlClientProvider locale="es" messages={esMessages} timeZone="UTC">

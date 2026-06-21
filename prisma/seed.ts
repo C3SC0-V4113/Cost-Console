@@ -105,7 +105,7 @@ async function main(): Promise<void> {
         notes: entry.notes ?? null,
       };
 
-      return [
+      const rows = [
         prisma.benchmarkResult.create({
           data: {
             ...base,
@@ -113,14 +113,20 @@ async function main(): Promise<void> {
             metricValue: entry.baselineAccuracy,
           },
         }),
-        prisma.benchmarkResult.create({
-          data: {
-            ...base,
-            benchmarkKind: 'semantic_layer_accuracy',
-            metricValue: entry.semanticAccuracy,
-          },
-        }),
       ];
+      // Raw-only benchmarks (BIRD, Spider) report no semantic-layer figure.
+      if (entry.semanticAccuracy !== undefined) {
+        rows.push(
+          prisma.benchmarkResult.create({
+            data: {
+              ...base,
+              benchmarkKind: 'semantic_layer_accuracy',
+              metricValue: entry.semanticAccuracy,
+            },
+          })
+        );
+      }
+      return rows;
     });
 
     await Promise.all([...catalogCreates, ...benchmarkCreates]);

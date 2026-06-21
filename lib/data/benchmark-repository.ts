@@ -64,7 +64,9 @@ export function toTextToSqlBenchmarks(rows: BenchmarkRow[]): TextToSqlBenchmarkD
 
   const scenarios: TextToSqlBenchmarkDTO[] = [];
   for (const [id, pair] of byKey) {
-    if (!pair.baseline || !pair.semantic) {
+    // A baseline (text_to_sql_accuracy) is required; the semantic-layer figure
+    // is optional so raw-only benchmarks (BIRD, Spider) still appear.
+    if (!pair.baseline) {
       continue;
     }
     const { baseline, semantic } = pair;
@@ -76,7 +78,7 @@ export function toTextToSqlBenchmarks(rows: BenchmarkRow[]): TextToSqlBenchmarkD
       metricType: baseline.metricType,
       isOfficial: baseline.isOfficial,
       baselineAccuracy: baseline.metricValue.toString(),
-      semanticAccuracy: semantic.metricValue.toString(),
+      semanticAccuracy: semantic ? semantic.metricValue.toString() : null,
       notes: baseline.notes,
       source: toSourceDTO(baseline.sourceReference),
     });

@@ -48,9 +48,19 @@ describe('toTextToSqlBenchmarks', () => {
     expect(scenarios[0]?.source?.retrievedAt).toBe('2026-06-19T00:00:00.000Z');
   });
 
-  it('omits a scenario that is missing its semantic half', () => {
+  it('emits a raw-only scenario when only the baseline half exists', () => {
     const scenarios = toTextToSqlBenchmarks([
       row({ benchmarkKind: 'text_to_sql_accuracy', metricValue: '52.5' }),
+    ]);
+
+    expect(scenarios).toHaveLength(1);
+    expect(scenarios[0]?.baselineAccuracy).toBe('52.5');
+    expect(scenarios[0]?.semanticAccuracy).toBeNull();
+  });
+
+  it('omits a scenario that has only a semantic half and no baseline', () => {
+    const scenarios = toTextToSqlBenchmarks([
+      row({ benchmarkKind: 'semantic_layer_accuracy', metricValue: '68' }),
     ]);
 
     expect(scenarios).toHaveLength(0);

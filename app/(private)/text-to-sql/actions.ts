@@ -26,6 +26,10 @@ const textToSqlCostInputSchema = z.object({
   validationPromptTokens: z.number().int().min(0).max(TOKEN_LIMIT),
   maxRepairAttempts: z.number().int().min(0).max(20),
   promptCacheHitPercentage: z.number().min(0).max(100),
+  // Manual accuracy override for domains the benchmark does not match (ADR 0004).
+  overrideAccuracy: z.boolean(),
+  overrideBaselineAccuracy: z.number().min(0).max(100),
+  overrideSemanticAccuracy: z.number().min(0).max(100),
 });
 
 export type TextToSqlCostActionResult =
@@ -70,13 +74,28 @@ export async function calculateTextToSqlCost(raw: unknown): Promise<TextToSqlCos
     return { ok: false, error: 'benchmark_unavailable' };
   }
 
+  // The benchmark defines the scenario structure (raw-only vs paired); the manual
+  // override only adjusts the numbers, keeping that structure.
+  const baselineAccuracyPercentage = benchmark
+    ? input.overrideAccuracy
+      ? input.overrideBaselineAccuracy
+      : Number(benchmark.baselineAccuracy)
+    : null;
+  const semanticAccuracyPercentage =
+    benchmark && benchmark.semanticAccuracy !== null
+      ? input.overrideAccuracy
+        ? input.overrideSemanticAccuracy
+        : Number(benchmark.semanticAccuracy)
+      : null;
+  const isPaired = semanticAccuracyPercentage !== null;
+
   const result = computeTextToSqlCost(
     {
       ...input,
-      includeSemantic: benchmark !== null,
-      includeRetry: input.includeRetry,
-      baselineAccuracyPercentage: benchmark ? Number(benchmark.baselineAccuracy) : null,
-      semanticAccuracyPercentage: benchmark ? Number(benchmark.semanticAccuracy) : null,
+      includeSemantic: isPaired,
+      includeRetry: input.includeRetry && isPaired,
+      baselineAccuracyPercentage,
+      semanticAccuracyPercentage,
     },
     {
       currency: row.currency,
