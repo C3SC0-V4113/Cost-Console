@@ -25,3 +25,4 @@ context.
 - [0007-adopt-identity-service-login-and-admin-managed-pricing-snapshots.md](./0007-adopt-identity-service-login-and-admin-managed-pricing-snapshots.md)
 - [0008-resolve-money-decimal-supabase-provider-and-prisma7-runtime.md](./0008-resolve-money-decimal-supabase-provider-and-prisma7-runtime.md)
 - [0009-source-text-to-sql-accuracy-from-cited-benchmarks.md](./0009-source-text-to-sql-accuracy-from-cited-benchmarks.md)
+- [0010-adopt-react-flow-for-rag-pipeline-diagram.md](./0010-adopt-react-flow-for-rag-pipeline-diagram.md)

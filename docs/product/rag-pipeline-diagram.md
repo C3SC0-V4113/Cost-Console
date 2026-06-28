@@ -1,6 +1,6 @@
 # RAG Pipeline Diagram (Evolutionary Spec)
 
-Status: Approved, deferred. Not implemented in the current RAG Cost Lab slice.
+Status: Implemented in Phase 7 (2026-06-22).
 
 This document specifies the optional, educational pipeline diagram for the RAG
 Cost Lab. It is a **future** enhancement layered on top of the shipped cost
@@ -21,8 +21,8 @@ calculation logic`).
 - **"Weights" means real retrieval parameters**, not arbitrary database weights
   (ADR 0003): `top-k`, score threshold, chunk size, chunk overlap, cleanup
   retention, and hybrid semantic/text weighting.
-- **No new runtime dependency is added until this phase is actually built.**
-  React Flow is the intended library but is not installed by the current slice.
+- **React Flow remains a client-only view dependency.** It is lazy-loaded only
+  after the Pipeline tab is selected and never participates in server rendering.
 
 ## Pipeline stages (nodes)
 
@@ -42,20 +42,21 @@ Edges carry the token quantity flowing between stages (e.g. retrieved chunks →
 LLM context shows `retrievedContextTokens`), pulled from the existing
 `RagCostResult`, not recomputed.
 
-## Implementation guidance (when built)
+## Implemented architecture
 
 - Render with `next/dynamic` and `ssr: false` — React Flow needs the DOM and must
   not run during server rendering or bloat the server bundle.
 - Scope the dynamic import to a tab/section inside the RAG route only, so the
   diagram bundle never loads for users who stay on the form.
 - Drive every node label and edge value from the `RagCostResult` already returned
-  by the server action; selecting/editing a node updates the same calculator
-  state that the form uses (one input model, two views).
+  by the server action and the shared `RagCalculatorInputs` state. The current
+  diagram is read-only: one input model, two views, with no duplicated cost math.
 - Keep node colors paired with text labels (accessibility; not color alone),
   consistent with `DESIGN.md` and the catalog freshness/validity treatment.
 
-## Out of scope for this spec
+## Remaining future work
 
+- Editable nodes that write back to the shared calculator state.
 - Persistence of diagram layouts (depends on the deferred Saved Scenarios work,
   see `docs/product/saved-scenarios.md`).
 - Benchmark overlays (MTEB/BEIR retrieval-quality metrics) — these are quality

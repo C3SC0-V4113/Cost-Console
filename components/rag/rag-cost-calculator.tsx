@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
@@ -8,7 +9,9 @@ import { ModelSelect, NumberField, Section } from '@/components/calc/calculator-
 import { HelpTip } from '@/components/help/help-tip';
 import { TokenLab } from '@/components/help/token-lab';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { RagCostSummary } from './rag-cost-summary';
 import { DEFAULT_RAG_INPUTS } from './rag-inputs';
@@ -27,6 +30,14 @@ export type RagModelOption = {
 
 const RECOMPUTE_DEBOUNCE_MS = 250;
 const MAX_DAYS_PER_MONTH = 31;
+
+const RagPipelineDiagram = dynamic(
+  () => import('./rag-pipeline-diagram').then((module) => module.RagPipelineDiagram),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[520px] w-full rounded-lg" />,
+  }
+);
 
 export function RagCostCalculator({
   embeddingModels,
@@ -47,6 +58,7 @@ export function RagCostCalculator({
   }));
   const [result, setResult] = useState<RagCostResult | null>(defaultResult);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [activeTab, setActiveTab] = useState('calculator');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   async function recompute(next: RagCalculatorInputs) {
@@ -73,187 +85,204 @@ export function RagCostCalculator({
     null;
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-      <div className="grid gap-5">
-        <Section title={tr('sectionModels')}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <ModelSelect
-              id="rag-embedding-model"
-              label={tr('embeddingModelLabel')}
-              value={inputs.ingestionEmbeddingModel}
-              options={embeddingModels}
-              placeholder={tr('embeddingModelPlaceholder')}
-              // One embedding model serves both ingestion and query in the common setup.
-              onChange={(value) =>
-                update({ ingestionEmbeddingModel: value, queryEmbeddingModel: value })
-              }
-            />
-            <ModelSelect
-              id="rag-generation-model"
-              label={tr('generationModelLabel')}
-              value={inputs.generationModel}
-              options={generationModels}
-              placeholder={tr('generationModelPlaceholder')}
-              onChange={(value) => update({ generationModel: value })}
-            />
-          </div>
-        </Section>
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <TabsList aria-label={tr('diagram.viewLabel')}>
+        <TabsTrigger value="calculator">{tr('diagram.calculatorTab')}</TabsTrigger>
+        <TabsTrigger value="diagram">{tr('diagram.diagramTab')}</TabsTrigger>
+      </TabsList>
+      <TabsContent value="calculator">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+          <div className="grid gap-5">
+            <Section title={tr('sectionModels')}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <ModelSelect
+                  id="rag-embedding-model"
+                  label={tr('embeddingModelLabel')}
+                  value={inputs.ingestionEmbeddingModel}
+                  options={embeddingModels}
+                  placeholder={tr('embeddingModelPlaceholder')}
+                  // One embedding model serves both ingestion and query in the common setup.
+                  onChange={(value) =>
+                    update({ ingestionEmbeddingModel: value, queryEmbeddingModel: value })
+                  }
+                />
+                <ModelSelect
+                  id="rag-generation-model"
+                  label={tr('generationModelLabel')}
+                  value={inputs.generationModel}
+                  options={generationModels}
+                  placeholder={tr('generationModelPlaceholder')}
+                  onChange={(value) => update({ generationModel: value })}
+                />
+              </div>
+            </Section>
 
-        <Section
-          title={tr('sectionIngestion')}
-          help={<HelpTip label={t('ingestion.label')}>{t('ingestion.body')}</HelpTip>}
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <NumberField
-              id="document-count"
-              label={tr('documentCount')}
-              value={inputs.documentCount}
-              onChange={(value) => update({ documentCount: value })}
-            />
-            <NumberField
-              id="avg-document-tokens"
-              label={tr('avgDocumentTokens')}
-              value={inputs.avgDocumentTokens}
-              onChange={(value) => update({ avgDocumentTokens: value })}
-            />
-            <NumberField
-              id="cleanup-retention"
-              label={tr('cleanupRetention')}
-              value={inputs.cleanupRetentionPercentage}
-              onChange={(value) => update({ cleanupRetentionPercentage: Math.min(100, value) })}
-              help={
-                <HelpTip label={t('cleanupRetention.label')}>{t('cleanupRetention.body')}</HelpTip>
-              }
-            />
-            <NumberField
-              id="chunk-size"
-              label={tr('chunkSize')}
-              value={inputs.chunkSize}
-              onChange={(value) => update({ chunkSize: value })}
-              help={<HelpTip label={t('chunking.label')}>{t('chunking.body')}</HelpTip>}
-            />
-            <NumberField
-              id="chunk-overlap"
-              label={tr('chunkOverlap')}
-              value={inputs.chunkOverlap}
-              onChange={(value) => update({ chunkOverlap: value })}
-            />
-          </div>
-          <TokenLab />
-        </Section>
-
-        <Section title={tr('sectionQuery')}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <NumberField
-              id="queries-per-day"
-              label={tr('queriesPerDay')}
-              value={inputs.queriesPerDay}
-              onChange={(value) => update({ queriesPerDay: value })}
-            />
-            <NumberField
-              id="rag-days-per-month"
-              label={tr('daysPerMonth')}
-              value={inputs.daysPerMonth}
-              onChange={(value) => update({ daysPerMonth: Math.min(MAX_DAYS_PER_MONTH, value) })}
-            />
-            <NumberField
-              id="avg-query-tokens"
-              label={tr('avgQueryTokens')}
-              value={inputs.avgQueryTokens}
-              onChange={(value) => update({ avgQueryTokens: value })}
-            />
-            <NumberField
-              id="top-k"
-              label={tr('topK')}
-              value={inputs.topK}
-              onChange={(value) => update({ topK: value })}
-              help={<HelpTip label={t('topK.label')}>{t('topK.body')}</HelpTip>}
-            />
-            <NumberField
-              id="avg-retrieved-chunk-tokens"
-              label={tr('avgRetrievedChunkTokens')}
-              value={inputs.avgRetrievedChunkTokens}
-              onChange={(value) => update({ avgRetrievedChunkTokens: value })}
-              help={
-                <HelpTip label={t('retrievedContext.label')}>{t('retrievedContext.body')}</HelpTip>
-              }
-            />
-          </div>
-        </Section>
-
-        <Section
-          title={tr('sectionGeneration')}
-          help={
-            <HelpTip
-              level="info"
-              label={t('promptCaching.label')}
-              sourceHref="https://platform.openai.com/docs/guides/prompt-caching"
-              sourceLabel={t('promptCaching.sourceLabel')}
+            <Section
+              title={tr('sectionIngestion')}
+              help={<HelpTip label={t('ingestion.label')}>{t('ingestion.body')}</HelpTip>}
             >
-              {t('promptCaching.body')}
-            </HelpTip>
-          }
-        >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <NumberField
-              id="rag-system-prompt-tokens"
-              label={tr('systemPromptTokens')}
-              value={inputs.systemPromptTokens}
-              onChange={(value) => update({ systemPromptTokens: value })}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <NumberField
+                  id="document-count"
+                  label={tr('documentCount')}
+                  value={inputs.documentCount}
+                  onChange={(value) => update({ documentCount: value })}
+                />
+                <NumberField
+                  id="avg-document-tokens"
+                  label={tr('avgDocumentTokens')}
+                  value={inputs.avgDocumentTokens}
+                  onChange={(value) => update({ avgDocumentTokens: value })}
+                />
+                <NumberField
+                  id="cleanup-retention"
+                  label={tr('cleanupRetention')}
+                  value={inputs.cleanupRetentionPercentage}
+                  onChange={(value) => update({ cleanupRetentionPercentage: Math.min(100, value) })}
+                  help={
+                    <HelpTip label={t('cleanupRetention.label')}>
+                      {t('cleanupRetention.body')}
+                    </HelpTip>
+                  }
+                />
+                <NumberField
+                  id="chunk-size"
+                  label={tr('chunkSize')}
+                  value={inputs.chunkSize}
+                  onChange={(value) => update({ chunkSize: value })}
+                  help={<HelpTip label={t('chunking.label')}>{t('chunking.body')}</HelpTip>}
+                />
+                <NumberField
+                  id="chunk-overlap"
+                  label={tr('chunkOverlap')}
+                  value={inputs.chunkOverlap}
+                  onChange={(value) => update({ chunkOverlap: value })}
+                />
+              </div>
+              <TokenLab />
+            </Section>
+
+            <Section title={tr('sectionQuery')}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <NumberField
+                  id="queries-per-day"
+                  label={tr('queriesPerDay')}
+                  value={inputs.queriesPerDay}
+                  onChange={(value) => update({ queriesPerDay: value })}
+                />
+                <NumberField
+                  id="rag-days-per-month"
+                  label={tr('daysPerMonth')}
+                  value={inputs.daysPerMonth}
+                  onChange={(value) =>
+                    update({ daysPerMonth: Math.min(MAX_DAYS_PER_MONTH, value) })
+                  }
+                />
+                <NumberField
+                  id="avg-query-tokens"
+                  label={tr('avgQueryTokens')}
+                  value={inputs.avgQueryTokens}
+                  onChange={(value) => update({ avgQueryTokens: value })}
+                />
+                <NumberField
+                  id="top-k"
+                  label={tr('topK')}
+                  value={inputs.topK}
+                  onChange={(value) => update({ topK: value })}
+                  help={<HelpTip label={t('topK.label')}>{t('topK.body')}</HelpTip>}
+                />
+                <NumberField
+                  id="avg-retrieved-chunk-tokens"
+                  label={tr('avgRetrievedChunkTokens')}
+                  value={inputs.avgRetrievedChunkTokens}
+                  onChange={(value) => update({ avgRetrievedChunkTokens: value })}
+                  help={
+                    <HelpTip label={t('retrievedContext.label')}>
+                      {t('retrievedContext.body')}
+                    </HelpTip>
+                  }
+                />
+              </div>
+            </Section>
+
+            <Section
+              title={tr('sectionGeneration')}
               help={
-                <HelpTip label={t('systemPromptTokens.label')}>
-                  {t('systemPromptTokens.body')}
+                <HelpTip
+                  level="info"
+                  label={t('promptCaching.label')}
+                  sourceHref="https://platform.openai.com/docs/guides/prompt-caching"
+                  sourceLabel={t('promptCaching.sourceLabel')}
+                >
+                  {t('promptCaching.body')}
                 </HelpTip>
               }
-            />
-            <NumberField
-              id="expected-output-tokens"
-              label={tr('expectedOutputTokens')}
-              value={inputs.expectedOutputTokens}
-              onChange={(value) => update({ expectedOutputTokens: value })}
-              help={<HelpTip label={t('outputTokens.label')}>{t('outputTokens.body')}</HelpTip>}
-            />
+            >
+              <div className="grid gap-4 sm:grid-cols-2">
+                <NumberField
+                  id="rag-system-prompt-tokens"
+                  label={tr('systemPromptTokens')}
+                  value={inputs.systemPromptTokens}
+                  onChange={(value) => update({ systemPromptTokens: value })}
+                  help={
+                    <HelpTip label={t('systemPromptTokens.label')}>
+                      {t('systemPromptTokens.body')}
+                    </HelpTip>
+                  }
+                />
+                <NumberField
+                  id="expected-output-tokens"
+                  label={tr('expectedOutputTokens')}
+                  value={inputs.expectedOutputTokens}
+                  onChange={(value) => update({ expectedOutputTokens: value })}
+                  help={<HelpTip label={t('outputTokens.label')}>{t('outputTokens.body')}</HelpTip>}
+                />
+              </div>
+
+              {isCacheAvailable ? (
+                <div className="grid gap-3 pt-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex min-h-5 items-center gap-1">
+                      <Label htmlFor="rag-cache-hit">{tr('cacheHitRate')}</Label>
+                      <HelpTip label={t('cacheHitRate.label')}>{t('cacheHitRate.body')}</HelpTip>
+                    </div>
+                    <span className="text-sm font-medium text-foreground tabular-nums">
+                      {inputs.promptCacheHitPercentage}%
+                    </span>
+                  </div>
+                  <Slider
+                    id="rag-cache-hit"
+                    value={[inputs.promptCacheHitPercentage]}
+                    min={0}
+                    max={100}
+                    step={1}
+                    onValueChange={(values) => update({ promptCacheHitPercentage: values[0] ?? 0 })}
+                  />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {tr('cacheUnavailable', { provider: result?.query.generation.provider ?? '' })}
+                </p>
+              )}
+            </Section>
           </div>
 
-          {isCacheAvailable ? (
-            <div className="grid gap-3 pt-1">
-              <div className="flex items-center justify-between">
-                <div className="flex min-h-5 items-center gap-1">
-                  <Label htmlFor="rag-cache-hit">{tr('cacheHitRate')}</Label>
-                  <HelpTip label={t('cacheHitRate.label')}>{t('cacheHitRate.body')}</HelpTip>
-                </div>
-                <span className="text-sm font-medium text-foreground tabular-nums">
-                  {inputs.promptCacheHitPercentage}%
-                </span>
-              </div>
-              <Slider
-                id="rag-cache-hit"
-                value={[inputs.promptCacheHitPercentage]}
-                min={0}
-                max={100}
-                step={1}
-                onValueChange={(values) => update({ promptCacheHitPercentage: values[0] ?? 0 })}
-              />
+          <div className="grid content-start gap-3">
+            <div className="flex items-center gap-2">
+              <h2 className="font-heading text-lg font-semibold text-foreground">
+                {tr('costSummary')}
+              </h2>
+              {isCalculating ? (
+                <span className="text-xs text-muted-foreground">{tr('calculating')}</span>
+              ) : null}
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              {tr('cacheUnavailable', { provider: result?.query.generation.provider ?? '' })}
-            </p>
-          )}
-        </Section>
-      </div>
-
-      <div className="grid content-start gap-3">
-        <div className="flex items-center gap-2">
-          <h2 className="font-heading text-lg font-semibold text-foreground">
-            {tr('costSummary')}
-          </h2>
-          {isCalculating ? (
-            <span className="text-xs text-muted-foreground">{tr('calculating')}</span>
-          ) : null}
+            <RagCostSummary result={result} retrieval={retrieval} />
+          </div>
         </div>
-        <RagCostSummary result={result} retrieval={retrieval} />
-      </div>
-    </div>
+      </TabsContent>
+      <TabsContent value="diagram">
+        {activeTab === 'diagram' ? <RagPipelineDiagram inputs={inputs} result={result} /> : null}
+      </TabsContent>
+    </Tabs>
   );
 }

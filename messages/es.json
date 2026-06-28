@@ -402,6 +402,81 @@
       "topK": "Top-k",
       "queriesPerDay": "Consultas / día",
       "cacheHitPercentage": "% aciertos de caché"
+    },
+    "diagram": {
+      "viewLabel": "Vista del laboratorio de costos RAG",
+      "calculatorTab": "Calculadora",
+      "diagramTab": "Pipeline",
+      "ariaLabel": "Diagrama de solo lectura del pipeline RAG",
+      "empty": "Eleg? modelos de embedding y generaci?n para ver el pipeline.",
+      "stageLabel": "Etapa del pipeline",
+      "edgeValue": "{label}: {value} {unit}",
+      "stages": {
+        "sourceDocuments": "Documentos fuente",
+        "chunking": "Segmentaci?n",
+        "embeddingIngestion": "Ingesti?n de embeddings",
+        "vectorStorage": "?ndice vectorial / almacenamiento",
+        "queryEmbedding": "Embedding de consulta",
+        "vectorSearch": "B?squeda vectorial / h?brida",
+        "retrievedChunks": "Chunks recuperados",
+        "llmContext": "Contexto del LLM",
+        "generatedOutput": "Salida generada"
+      },
+      "statuses": {
+        "available": "Con fuente citada",
+        "estimated": "Estimaci?n calculada",
+        "unavailable": "Precio no disponible"
+      },
+      "metrics": {
+        "documentCount": "Documentos",
+        "avgDocumentTokens": "Promedio por documento",
+        "effectiveCorpusTokens": "Corpus efectivo",
+        "chunkSize": "Tama?o de chunk",
+        "chunkOverlap": "Solapamiento",
+        "cleanupRetention": "Retenci?n de limpieza",
+        "expectedChunks": "Chunks esperados",
+        "model": "Modelo",
+        "embeddingTokens": "Tokens de embedding",
+        "oneTimeCost": "Costo ?nico",
+        "storedChunks": "Vectores almacenados",
+        "monthlyCost": "Almacenamiento mensual",
+        "storagePrice": "Precio de almacenamiento",
+        "queryTokens": "Consulta",
+        "costPerQuery": "Embedding / consulta",
+        "topK": "Top-k",
+        "scoreThreshold": "Umbral de puntaje",
+        "searchMode": "Modo de b?squeda",
+        "retrievedChunks": "Chunks recuperados",
+        "avgRetrievedChunkTokens": "Promedio por chunk",
+        "retrievedContextTokens": "Contexto recuperado",
+        "generationModel": "Modelo generativo",
+        "systemPromptTokens": "System prompt",
+        "questionTokens": "Pregunta",
+        "uncachedInput": "Entrada sin cach?",
+        "cachedInput": "Entrada en cach?",
+        "cacheWrite": "Escritura en cach?",
+        "expectedOutputTokens": "Salida esperada",
+        "billedOutputTokens": "Salida facturada",
+        "outputCost": "Costo de salida"
+      },
+      "edges": {
+        "effectiveCorpus": "Corpus efectivo",
+        "embeddingTokens": "Carga de embedding",
+        "vectors": "Vectores almacenados",
+        "queryTokens": "Carga de consulta",
+        "retrievedContext": "Contexto recuperado",
+        "generatedOutput": "Salida generada"
+      },
+      "units": {
+        "tokens": "tokens",
+        "count": "elementos",
+        "text": ""
+      },
+      "values": {
+        "unavailable": "Sin precio con fuente citada",
+        "notConfigured": "No configurado",
+        "vector": "B?squeda vectorial"
+      }
     }
   },
   "textToSql": {

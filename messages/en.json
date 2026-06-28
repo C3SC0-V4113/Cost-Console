@@ -402,6 +402,81 @@
       "topK": "Top-k",
       "queriesPerDay": "Queries / day",
       "cacheHitPercentage": "Cache hit %"
+    },
+    "diagram": {
+      "viewLabel": "RAG Cost Lab view",
+      "calculatorTab": "Calculator",
+      "diagramTab": "Pipeline",
+      "ariaLabel": "Read-only RAG pipeline diagram",
+      "empty": "Select embedding and generation models to view the pipeline.",
+      "stageLabel": "Pipeline stage",
+      "edgeValue": "{label}: {value} {unit}",
+      "stages": {
+        "sourceDocuments": "Source documents",
+        "chunking": "Chunking",
+        "embeddingIngestion": "Embedding ingestion",
+        "vectorStorage": "Vector index / storage",
+        "queryEmbedding": "Query embedding",
+        "vectorSearch": "Vector / hybrid search",
+        "retrievedChunks": "Retrieved chunks",
+        "llmContext": "LLM context",
+        "generatedOutput": "Generated output"
+      },
+      "statuses": {
+        "available": "Source-backed",
+        "estimated": "Calculated estimate",
+        "unavailable": "Price unavailable"
+      },
+      "metrics": {
+        "documentCount": "Documents",
+        "avgDocumentTokens": "Avg document",
+        "effectiveCorpusTokens": "Effective corpus",
+        "chunkSize": "Chunk size",
+        "chunkOverlap": "Overlap",
+        "cleanupRetention": "Cleanup retention",
+        "expectedChunks": "Expected chunks",
+        "model": "Model",
+        "embeddingTokens": "Embedding tokens",
+        "oneTimeCost": "One-time cost",
+        "storedChunks": "Stored vectors",
+        "monthlyCost": "Monthly storage",
+        "storagePrice": "Storage price",
+        "queryTokens": "Query",
+        "costPerQuery": "Embedding / query",
+        "topK": "Top-k",
+        "scoreThreshold": "Score threshold",
+        "searchMode": "Search mode",
+        "retrievedChunks": "Retrieved chunks",
+        "avgRetrievedChunkTokens": "Avg retrieved chunk",
+        "retrievedContextTokens": "Retrieved context",
+        "generationModel": "Generation model",
+        "systemPromptTokens": "System prompt",
+        "questionTokens": "Question",
+        "uncachedInput": "Uncached input",
+        "cachedInput": "Cached input",
+        "cacheWrite": "Cache write",
+        "expectedOutputTokens": "Expected output",
+        "billedOutputTokens": "Billed output",
+        "outputCost": "Output cost"
+      },
+      "edges": {
+        "effectiveCorpus": "Effective corpus",
+        "embeddingTokens": "Embedding payload",
+        "vectors": "Stored vectors",
+        "queryTokens": "Query payload",
+        "retrievedContext": "Retrieved context",
+        "generatedOutput": "Generated output"
+      },
+      "units": {
+        "tokens": "tokens",
+        "count": "items",
+        "text": ""
+      },
+      "values": {
+        "unavailable": "No source-backed price",
+        "notConfigured": "Not configured",
+        "vector": "Vector search"
+      }
     }
   },
   "textToSql": {
